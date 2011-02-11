@@ -26,6 +26,7 @@ TODO:
 #include <stdlib.h>
 
 #include "vmath.h"
+#include "settings.h"
 #include "helpers.h"
 using namespace std;
 
@@ -40,34 +41,6 @@ using namespace std;
 #define WHEIGHT 1000
 #define CZ 50 //cell size in pixels, for food squares. Should divide well into Width Height
 
-int NUMBOTS=30; //initially, and minimally
-float BOTRADIUS=10; //for drawing
-float BOTSPEED= 0.1;
-float SPIKESPEED= 0.005; //how quickly can attack spike go up?
-float SPIKEMULT= 0.5; //essentially the strength of every spike impact
-int BABIES=2; //number of babies per agent when they reproduce
-float BOOSTSIZEMULT=2; //how much boost do agents get? when boost neuron is on
-float REPRATEH=7; //reproduction rate for herbivors
-float REPRATEC=7; //reproduction rate for carnivors
-
-float DIST= 150;		//how far can the eyes see on each bot?
-float EYE_SENSITIVITY= 2; //how sensitive are the eyes?
-float BLOOD_SENSITIVITY= 2; //how sensitive are blood sensors?
-float METAMUTRATE1= 0.002; //what is the change in MUTRATE1 and 2 on reproduction? lol
-float METAMUTRATE2= 0.05;
-
-float FOODGROWTH= 0;//0.00001; //how quickly does food grow on a square?
-float FOODINTAKE= 0.00325; //how much does every agent consume?
-float FOODWASTE= 0.001; //how much food disapears if agent eats?
-float FOODMAX= 0.5; //how much food per cell can there be at max?
-int FOODADDFREQ= 30; //how often does random square get to full food?
-
-float FOODTRANSFER= 0.001; //how much is transfered between two agents trading food? per iteration
-float FOOD_SHARING_DISTANCE= 50; //how far away is food shared between bots?
-
-int CLOSED=0; //if environment is closed, then no random bots are added per time interval
-
-float FOOD_DISTRIBUTION_RADIUS=100; //when bot is killed, how far is its body distributed?
 
 
 //for fps
@@ -306,7 +279,7 @@ public:
 		ir=0;ig=0;ib=0;
 		hybrid= false;
 		herbivore= randf(0,1);
-		repcounter= herbivore*randf(REPRATEH-0.1,REPRATEH+0.1) + (1-herbivore)*randf(REPRATEC-0.1,REPRATEC+0.1);
+		repcounter= herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
 		
 		id=0;
 
@@ -371,7 +344,7 @@ void renderScene() {
 		glBegin(GL_QUADS);
 		for(int i=0;i<FW;i++){
 			for(int j=0;j<FH;j++){
-				float f= 0.5*food[i][j]/FOODMAX;
+				float f= 0.5*food[i][j]/conf::FOODMAX;
 				glColor3f(0.9-f,0.9-f,1.0-f);
 				glVertex3f(i*CZ,j*CZ,0);
 				glVertex3f(i*CZ+CZ,j*CZ,0);
@@ -383,8 +356,8 @@ void renderScene() {
 	}
 
 	float n;
-	float r= BOTRADIUS;
-	float rp= BOTRADIUS+2;
+	float r= conf::BOTRADIUS;
+	float rp= conf::BOTRADIUS+2;
 	//draw every agent
 	for(int i=0;i<agents.size();i++){
 	
@@ -394,7 +367,7 @@ void renderScene() {
 			//draw selection
 			glBegin(GL_POLYGON); 
 			glColor3f(1,1,0);
-			drawCircle(agents[i].pos.x, agents[i].pos.y, BOTRADIUS+5);
+			drawCircle(agents[i].pos.x, agents[i].pos.y, conf::BOTRADIUS+5);
 			glEnd();
 			
 			glPushMatrix();
@@ -445,7 +418,7 @@ void renderScene() {
 		//draw giving/receiving
 		if(agents[i].dfood!=0){
 			glBegin(GL_POLYGON);
-			float mag=cap(abs(agents[i].dfood)/FOODTRANSFER/3);
+			float mag=cap(abs(agents[i].dfood)/conf::FOODTRANSFER/3);
 			if(agents[i].dfood>0) glColor3f(0,mag,0); //draw boost as green outline
 			else glColor3f(mag,0,0);
 			for (int k=0;k<17;k++){
@@ -462,7 +435,7 @@ void renderScene() {
 		if(agents[i].indicator>0){
 			glBegin(GL_POLYGON);
 				glColor3f(agents[i].ir,agents[i].ig,agents[i].ib);
-				drawCircle(agents[i].pos.x, agents[i].pos.y, BOTRADIUS+((int)agents[i].indicator));
+				drawCircle(agents[i].pos.x, agents[i].pos.y, conf::BOTRADIUS+((int)agents[i].indicator));
 			glEnd();
 			agents[i].indicator-=1;
 		}
@@ -474,18 +447,18 @@ void renderScene() {
 			for(int j=-2;j<3;j++){
 				if(j==0)continue;
 				glVertex3f(agents[i].pos.x,agents[i].pos.y,0);
-				glVertex3f(agents[i].pos.x+(BOTRADIUS*4)*cos(agents[i].angle+j*M_PI/8),agents[i].pos.y+(BOTRADIUS*4)*sin(agents[i].angle+j*M_PI/8),0);
+				glVertex3f(agents[i].pos.x+(conf::BOTRADIUS*4)*cos(agents[i].angle+j*M_PI/8),agents[i].pos.y+(conf::BOTRADIUS*4)*sin(agents[i].angle+j*M_PI/8),0);
 			}
 			//and eye to the back
 			glVertex3f(agents[i].pos.x,agents[i].pos.y,0);
-			glVertex3f(agents[i].pos.x+(BOTRADIUS*1.5)*cos(agents[i].angle+M_PI+3*M_PI/16),agents[i].pos.y+(BOTRADIUS*1.5)*sin(agents[i].angle+M_PI+3*M_PI/16),0);
+			glVertex3f(agents[i].pos.x+(conf::BOTRADIUS*1.5)*cos(agents[i].angle+M_PI+3*M_PI/16),agents[i].pos.y+(conf::BOTRADIUS*1.5)*sin(agents[i].angle+M_PI+3*M_PI/16),0);
 			glVertex3f(agents[i].pos.x,agents[i].pos.y,0);
-			glVertex3f(agents[i].pos.x+(BOTRADIUS*1.5)*cos(agents[i].angle+M_PI-3*M_PI/16),agents[i].pos.y+(BOTRADIUS*1.5)*sin(agents[i].angle+M_PI-3*M_PI/16),0);
+			glVertex3f(agents[i].pos.x+(conf::BOTRADIUS*1.5)*cos(agents[i].angle+M_PI-3*M_PI/16),agents[i].pos.y+(conf::BOTRADIUS*1.5)*sin(agents[i].angle+M_PI-3*M_PI/16),0);
 		glEnd();
 
 		glBegin(GL_POLYGON); //body
 			glColor3f(agents[i].red,agents[i].gre,agents[i].blu);
-			drawCircle(agents[i].pos.x, agents[i].pos.y, BOTRADIUS);
+			drawCircle(agents[i].pos.x, agents[i].pos.y, conf::BOTRADIUS);
 		glEnd();
 
 		glBegin(GL_LINES); 
@@ -549,7 +522,7 @@ void renderScene() {
 			//draw giving/receiving
 			if(agents[i].dfood!=0){
 				
-				float mag=cap(abs(agents[i].dfood)/FOODTRANSFER/3);
+				float mag=cap(abs(agents[i].dfood)/conf::FOODTRANSFER/3);
 				if(agents[i].dfood>0) glColor3f(0,mag,0); //draw boost as green outline
 				else glColor3f(mag,0,0);
 				glVertex3f(agents[i].pos.x+xo+6,agents[i].pos.y+yo+36,0);
@@ -564,18 +537,18 @@ void renderScene() {
 		//print stats
 		//generation count
 		sprintf(buf2, "%i", agents[i].gencount);
-		RenderString(agents[i].pos.x-BOTRADIUS*1.5, agents[i].pos.y+BOTRADIUS*1.8, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
+		RenderString(agents[i].pos.x-conf::BOTRADIUS*1.5, agents[i].pos.y+conf::BOTRADIUS*1.8, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
 		//age
 		sprintf(buf2, "%i", agents[i].age);
-		RenderString(agents[i].pos.x-BOTRADIUS*1.5, agents[i].pos.y+BOTRADIUS*1.8+12, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
+		RenderString(agents[i].pos.x-conf::BOTRADIUS*1.5, agents[i].pos.y+conf::BOTRADIUS*1.8+12, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
 		
 		//health		
 		sprintf(buf2, "%.2f", agents[i].health);
-		RenderString(agents[i].pos.x-BOTRADIUS*1.5, agents[i].pos.y+BOTRADIUS*1.8+24, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
+		RenderString(agents[i].pos.x-conf::BOTRADIUS*1.5, agents[i].pos.y+conf::BOTRADIUS*1.8+24, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
 			
 		//repcounter
 		sprintf(buf2, "%.2f", agents[i].repcounter);
-		RenderString(agents[i].pos.x-BOTRADIUS*1.5, agents[i].pos.y+BOTRADIUS*1.8+36, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
+		RenderString(agents[i].pos.x-conf::BOTRADIUS*1.5, agents[i].pos.y+conf::BOTRADIUS*1.8+36, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
 	}
 
 	glPopMatrix();
@@ -600,7 +573,7 @@ void setInputs() {
 		//FOOD
 		int cx= (int) a->pos.x/CZ;
 		int cy= (int) a->pos.y/CZ;
-		a->in[4]= food[cx][cy]/FOODMAX;
+		a->in[4]= food[cx][cy]/conf::FOODMAX;
 
 		//SOUND SMELL EYES
 		float p1,r1,g1,b1,p2,r2,g2,b2,p3,r3,g3,b3;
@@ -616,21 +589,21 @@ void setInputs() {
 			if(i==j) continue;
 			Agent* a2= &agents[j];
 
-			if(a->pos.x<a2->pos.x-DIST || a->pos.x>a2->pos.x+DIST 
-				|| a->pos.y>a2->pos.y+DIST || a->pos.y<a2->pos.y-DIST) continue;
+			if(a->pos.x<a2->pos.x-conf::DIST || a->pos.x>a2->pos.x+conf::DIST 
+				|| a->pos.y>a2->pos.y+conf::DIST || a->pos.y<a2->pos.y-conf::DIST) continue;
 
 			float d= (a->pos-a2->pos).length();
 			
-			if(d<DIST){
+			if(d<conf::DIST){
 
 				//smell
-				smaccum+= 0.3*(DIST-d)/DIST;
+				smaccum+= 0.3*(conf::DIST-d)/conf::DIST;
 				
 				//sound
-				soaccum+= 0.4*(DIST-d)/DIST*(max(fabs(a2->w1),fabs(a2->w2)));
+				soaccum+= 0.4*(conf::DIST-d)/conf::DIST*(max(fabs(a2->w1),fabs(a2->w2)));
 				
 				//hearing. Listening to other agents
-				hearaccum+= a2->soundmul*(DIST-d)/DIST;
+				hearaccum+= a2->soundmul*(conf::DIST-d)/conf::DIST;
 
 				float ang= (a2->pos- a->pos).get_angle(); //current angle between bots
 				
@@ -657,9 +630,9 @@ void setInputs() {
 
 				if(diff1<PI38){
 					//we see this agent with left eye. Accumulate info
-					float mul1= EYE_SENSITIVITY*((PI38-diff1)/PI38)*((DIST-d)/DIST);
-					//float mul1= 100*((DIST-d)/DIST);
-					p1 += mul1*(d/DIST);
+					float mul1= conf::EYE_SENSITIVITY*((PI38-diff1)/PI38)*((conf::DIST-d)/conf::DIST);
+					//float mul1= 100*((conf::DIST-d)/conf::DIST);
+					p1 += mul1*(d/conf::DIST);
 					r1 += mul1*a2->red;
 					g1 += mul1*a2->gre;
 					b1 += mul1*a2->blu;
@@ -667,9 +640,9 @@ void setInputs() {
 
 				if(diff2<PI38){
 					//we see this agent with left eye. Accumulate info
-					float mul2= EYE_SENSITIVITY*((PI38-diff2)/PI38)*((DIST-d)/DIST);
-					//float mul2= 100*((DIST-d)/DIST);
-					p2 += mul2*(d/DIST);
+					float mul2= conf::EYE_SENSITIVITY*((PI38-diff2)/PI38)*((conf::DIST-d)/conf::DIST);
+					//float mul2= 100*((conf::DIST-d)/conf::DIST);
+					p2 += mul2*(d/conf::DIST);
 					r2 += mul2*a2->red;
 					g2 += mul2*a2->gre;
 					b2 += mul2*a2->blu;
@@ -677,16 +650,16 @@ void setInputs() {
 				
 				if(diff3<PI38){
 					//we see this agent with back eye. Accumulate info
-					float mul3= EYE_SENSITIVITY*((PI38-diff3)/PI38)*((DIST-d)/DIST);
-					//float mul2= 100*((DIST-d)/DIST);
-					p3 += mul3*(d/DIST);
+					float mul3= conf::EYE_SENSITIVITY*((PI38-diff3)/PI38)*((conf::DIST-d)/conf::DIST);
+					//float mul2= 100*((conf::DIST-d)/conf::DIST);
+					p3 += mul3*(d/conf::DIST);
 					r3 += mul3*a2->red;
 					g3 += mul3*a2->gre;
 					b3 += mul3*a2->blu;
 				}
 
 				if(diff4<PI38){
-					float mul4= BLOOD_SENSITIVITY*((PI38-diff4)/PI38)*((DIST-d)/DIST);
+					float mul4= conf::BLOOD_SENSITIVITY*((PI38-diff4)/PI38)*((conf::DIST-d)/conf::DIST);
 					//if we can see an agent close with both eyes in front of us
 					blood+= mul4*(1-agents[j].health/2); //remember: health is in [0 2]
 					//agents with high life dont bleed. low life makes them bleed more
@@ -743,7 +716,7 @@ void processOutputs(){
 		//spike length should slowly tend towards out[5]
 		float g= a->out[5];
 		if (a->spikeLength<g)
-			a->spikeLength+=SPIKESPEED;
+			a->spikeLength+=conf::SPIKESPEED;
 		else if(a->spikeLength>g)
 			a->spikeLength= g; //its easy to retract spike, just hard to put it up
 	}
@@ -753,16 +726,16 @@ void processOutputs(){
 	for(int i=0;i<agents.size();i++){
 		Agent* a= &agents[i];
 
-		Vector2f v(BOTRADIUS/2, 0);
+		Vector2f v(conf::BOTRADIUS/2, 0);
 		v.rotate(a->angle + M_PI/2);
 		
 		Vector2f w1p= a->pos+ v; //wheel positions
 		Vector2f w2p= a->pos- v;
 
-		float BW1= BOTSPEED*a->w1;
-		float BW2= BOTSPEED*a->w2;
-		if(a->boost){BW1=BW1*BOOSTSIZEMULT;}
-		if(a->boost){BW2=BW2*BOOSTSIZEMULT;}
+		float BW1= conf::BOTSPEED*a->w1;
+		float BW2= conf::BOTSPEED*a->w2;
+		if(a->boost){BW1=BW1*conf::BOOSTSIZEMULT;}
+		if(a->boost){BW2=BW2*conf::BOOSTSIZEMULT;}
 
 		//move bots
 		Vector2f vv= w2p- a->pos;
@@ -791,12 +764,12 @@ void processOutputs(){
 		float f= food[cx][cy];
 		if(f>0 && agents[i].health<2){
 			//agent eats the food
-			float itk=min(f,FOODINTAKE);
+			float itk=min(f,conf::FOODINTAKE);
 			float speedmul= (1-(abs(agents[i].w1)+abs(agents[i].w2))/2)/2 + 0.5;
 			itk= itk*agents[i].herbivore*agents[i].herbivore*speedmul; //herbivores gain more from ground food
 			agents[i].health+= itk;
 			agents[i].repcounter -= 3*itk;
-			food[cx][cy]-= min(f,FOODWASTE);
+			food[cx][cy]-= min(f,conf::FOODWASTE);
 		}
 	}
 
@@ -806,12 +779,12 @@ void processOutputs(){
 		if(agents[i].give>0.5){
 			for(int j=0;j<agents.size();j++){
 				float d= (agents[i].pos-agents[j].pos).length();
-				if(d<FOOD_SHARING_DISTANCE){
+				if(d<conf::FOOD_SHARING_DISTANCE){
 					//initiate transfer
-					if(agents[j].health<2) agents[j].health += FOODTRANSFER;
-					agents[i].health -= FOODTRANSFER;
-					agents[j].dfood += FOODTRANSFER; //only for drawing
-					agents[i].dfood -= FOODTRANSFER;
+					if(agents[j].health<2) agents[j].health += conf::FOODTRANSFER;
+					agents[i].health -= conf::FOODTRANSFER;
+					agents[j].dfood += conf::FOODTRANSFER; //only for drawing
+					agents[i].dfood -= conf::FOODTRANSFER;
 				}
 			}
 		}
@@ -824,7 +797,7 @@ void processOutputs(){
 				if(i==j || agents[i].spikeLength<0.2 || agents[i].w1<0.3 || agents[i].w2<0.3) continue;
 				float d= (agents[i].pos-agents[j].pos).length();
 
-				if(d<2*BOTRADIUS){
+				if(d<2*conf::BOTRADIUS){
 					//these two are in collision and agent i has extended spike and is going decent fast!
 					Vector2f v(1,0);
 					v.rotate(agents[i].angle);
@@ -832,8 +805,8 @@ void processOutputs(){
 					if(fabs(diff)<M_PI/8){
 						//bot i is also properly aligned!!! that's a hit
 						float mult=1;
-						if(agents[i].boost) mult= BOOSTSIZEMULT;
-						float DMG= SPIKEMULT*agents[i].spikeLength*max(fabs(agents[i].w1),fabs(agents[i].w2))*BOOSTSIZEMULT;
+						if(agents[i].boost) mult= conf::BOOSTSIZEMULT;
+						float DMG= conf::SPIKEMULT*agents[i].spikeLength*max(fabs(agents[i].w1),fabs(agents[i].w2))*conf::BOOSTSIZEMULT;
 						
 						agents[j].health-= DMG; 
 
@@ -867,27 +840,27 @@ void reproduce(int ai, float MR, float MR2){
 	if(randf(0,1)<0.04) MR2= MR2*randf(1, 10);
 
 	agents[ai].initEvent(30,0,0.8,0); //green event means agent reproduced.
-	for(int i=0;i<BABIES;i++){
+	for(int i=0;i<conf::BABIES;i++){
 		Agent a2;
 		
 		//spawn the baby somewhere closeby behind agent
 		//we want to spawn behind so that agents dont accidentally eat their young right away
-		Vector2f fb(BOTRADIUS,0);
+		Vector2f fb(conf::BOTRADIUS,0);
 		fb.rotate(-a2.angle);
-		a2.pos= agents[ai].pos + fb + Vector2f(randf(-BOTRADIUS*2,BOTRADIUS*2), randf(-BOTRADIUS*2,BOTRADIUS*2)); 
+		a2.pos= agents[ai].pos + fb + Vector2f(randf(-conf::BOTRADIUS*2,conf::BOTRADIUS*2), randf(-conf::BOTRADIUS*2,conf::BOTRADIUS*2)); 
 		if(a2.pos.x<0) a2.pos.x= WIDTH+a2.pos.x;
 		if(a2.pos.x>=WIDTH) a2.pos.x= a2.pos.x-WIDTH;
 		if(a2.pos.y<0) a2.pos.y= HEIGHT+a2.pos.y;
 		if(a2.pos.y>=HEIGHT) a2.pos.y= a2.pos.y-HEIGHT;
 
 		a2.gencount= agents[ai].gencount+1;
-		a2.repcounter= a2.herbivore*randf(REPRATEH-0.1,REPRATEH+0.1) + (1-a2.herbivore)*randf(REPRATEC-0.1,REPRATEC+0.1);
+		a2.repcounter= a2.herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-a2.herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
 
 		//noisy attribute passing
 		a2.MUTRATE1= agents[ai].MUTRATE1;
 		a2.MUTRATE2= agents[ai].MUTRATE2;
-		if(randf(0,1)<0.2) a2.MUTRATE1= randn(agents[ai].MUTRATE1, METAMUTRATE1);
-		if(randf(0,1)<0.2) a2.MUTRATE2= randn(agents[ai].MUTRATE2, METAMUTRATE2);
+		if(randf(0,1)<0.2) a2.MUTRATE1= randn(agents[ai].MUTRATE1, conf::METAMUTRATE1);
+		if(randf(0,1)<0.2) a2.MUTRATE2= randn(agents[ai].MUTRATE2, conf::METAMUTRATE2);
 		if(agents[ai].MUTRATE1<0.001) agents[ai].MUTRATE1= 0.001;
 		if(agents[ai].MUTRATE2<0.02) agents[ai].MUTRATE2= 0.02;
 		a2.herbivore= cap(randn(agents[ai].herbivore, MR2*4));
@@ -1040,10 +1013,10 @@ void update() {
 		modcounter=0;
 		epoch++;
 	}
-	if(modcounter%FOODADDFREQ==0){
+	if(modcounter%conf::FOODADDFREQ==0){
 		fx=randi(0,FW);
 		fy=randi(0,FH);
-		food[fx][fy]= FOODMAX;
+		food[fx][fy]= conf::FOODMAX;
 	}
 	
 	//give input to every agent. Sets in[] array
@@ -1063,7 +1036,7 @@ void update() {
 
 		if(agents[i].boost){
 			//boost carries its price, and it's pretty heavy!
-			agents[i].health -= baseloss*BOOSTSIZEMULT*2;
+			agents[i].health -= baseloss*conf::BOOSTSIZEMULT*2;
 		} else {
 			agents[i].health -= baseloss;
 		}
@@ -1079,7 +1052,7 @@ void update() {
 			for(int j=0;j<agents.size();j++){
 				if(agents[j].health>0){
 					float d= (agents[i].pos-agents[j].pos).length();
-					if(d<FOOD_DISTRIBUTION_RADIUS){
+					if(d<conf::FOOD_DISTRIBUTION_RADIUS){
 						numaround++;
 					}
 				}
@@ -1089,7 +1062,7 @@ void update() {
 				for(int j=0;j<agents.size();j++){
 					if(agents[j].health>0 && agents[j].herbivore<0.7){
 						float d= (agents[i].pos-agents[j].pos).length();
-						if(d<FOOD_DISTRIBUTION_RADIUS){
+						if(d<conf::FOOD_DISTRIBUTION_RADIUS){
 							agents[j].health += 3*(1-agents[j].herbivore)*(1-agents[j].herbivore)/numaround;
 							agents[j].repcounter -= 2*(1-agents[j].herbivore)*(1-agents[j].herbivore)/numaround; //good job, can use spare parts to make copies
 							if(agents[j].health>2) agents[j].health=2; //cap it!
@@ -1114,23 +1087,24 @@ void update() {
 	for(int i=0;i<agents.size();i++){
 		if(agents[i].repcounter<0 && agents[i].health>0.65){ //agent is healthy and is ready to reproduce
 			//agents[i].health= 0.8; //the agent is left vulnerable and weak, a bit
-			reproduce(i, agents[i].MUTRATE1, agents[i].MUTRATE2); //this adds BABIES new agents to agents[]
-			agents[i].repcounter= agents[i].herbivore*randf(REPRATEH-0.1,REPRATEH+0.1) + (1-agents[i].herbivore)*randf(REPRATEC-0.1,REPRATEC+0.1);
+			reproduce(i, agents[i].MUTRATE1, agents[i].MUTRATE2); //this adds conf::BABIES new agents to agents[]
+			agents[i].repcounter= agents[i].herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-agents[i].herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
 		}
 	}
 	
 	//environment tick
 	for(int x=0;x<FW;x++){
 		for(int y=0;y<FH;y++){
-			food[x][y]+= FOODGROWTH; //food grows
-			if(food[x][y]>FOODMAX)food[x][y]=FOODMAX; //cap at FOODMAX
+			food[x][y]+= conf::FOODGROWTH; //food grows
+			if(food[x][y]>conf::FOODMAX)food[x][y]=conf::FOODMAX; //cap at conf::FOODMAX
 		}
 	}
 
 	//add new agents, if environment isn't closed
-	if(CLOSED==0){ 
+	if(conf::CLOSED==0){ 
 		//make sure environment is always populated with at least NUMBOTS bots
-		if(agents.size()<NUMBOTS){
+		if(agents.size()<conf::NUMBOTS
+){
 			//add new agent
 			addRandomBots(1);
 		}
@@ -1171,7 +1145,8 @@ void processNormalKeys(unsigned char key, int x, int y) {
 		exit(0);
 	else if (key=='r') {
 		agents.clear();
-		addRandomBots(NUMBOTS);
+		addRandomBots(conf::NUMBOTS
+);
 		printf("Agents reset\n");
 	} else if (key=='p') {
 		//pause
@@ -1189,8 +1164,8 @@ void processNormalKeys(unsigned char key, int x, int y) {
 	} else if(key=='f'){
 		drawFood=!drawFood;
 	} else if(key=='c'){
-		CLOSED= 1-CLOSED;
-		printf("Environemt closed now= %i\n",CLOSED==0?0:1);
+		conf::CLOSED= 1-conf::CLOSED;
+		printf("Environemt closed now= %i\n",conf::CLOSED==0?0:1);
 	} else {
 		printf("Unknown key pressed: %i\n", key);
 	}
@@ -1233,7 +1208,8 @@ int main(int argc, char **argv) {
 	FILE* fp = fopen("report.txt", "w");
 	fclose(fp);
 
-	addRandomBots(NUMBOTS);
+	addRandomBots(conf::NUMBOTS
+);
 	//for(int k=0;k<500;k++) reproduce(0, 100*agents[0].MUTRATE1, 100*agents[0].MUTRATE2);
 
 	//inititalize food layer
