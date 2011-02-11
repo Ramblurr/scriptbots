@@ -1,6 +1,3 @@
-*.vcproj*
-*.lib
-*.dll
 *~
 *.kdev4
 Debug/
