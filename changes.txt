@@ -1,0 +1,15 @@
+(current)
+
+- Fixed compilation issues on Linux
+- Ported to CMake build system
+
+v1.2 changes (released 19 January 2011):
+
+- New Brain: DWRAON (Damped Weighted Recurrent AND/OR Network). This is better due to more continuous behavior than the old, discrete, rule based system.
+- No dichotomy of herbivore/carnivore. There is a stomach specialization variable between 0,1. At 0, specialized to process plants, at 1, meat. This trait is inherited and undergoes mutation. This also supports emergence of omnivores, which can process both, to a lesser degree.
+- Meat food is now only allocated when a creature dies, as opposed to when it is injured. It is distributed evenly to all nearby creatures when the kill occurs. This leads more clearly to emergence of hunting packs.
+- Ability to judge health of an organism in front was added. I think of it something as a blood sensor. Essentially, it fires if something wounded is ahead. This can make agents become selective when hunting.
+- More sensors were added: Two clock neurons that have time-varying activity at a some frequency that can be inherited. This is useful for introducing base activity into the brain, and also for giving agents a simple way to keep track of time, and do something at regular intervals. 
+- Also, a hearing sensor was added that directly simulates sound. Agents can now shout at each other, but probably lack the capacity to temporally parse a shouting stream and create anything that resembles a non-trivial language.
+- Sound generator actuator was added, which simulates creating sound and corresponds to shouting.
+- Ability to share food was added. An agent can choose to give up its food to organisms around it. This potentially enables emergence of altruism: When a bot is too high in health, it may sense that there is one of its kind ahead that needs food, and choose to give it up.
