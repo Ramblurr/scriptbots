@@ -17,4 +17,8 @@ $ make
 To execute ScriptBots simply type the following in the build directory:
 $ ./scriptbots
 
+
+For windows: 
+Follow basically the same steps, but after running cmake open up the VS solution (.sln) file it generates and compile the project from VS.
+
 See README.txt for controls and a message from Andrej
