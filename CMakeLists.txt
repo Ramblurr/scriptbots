@@ -2,6 +2,12 @@ project(scriptbots)
 cmake_minimum_required(VERSION 2.8)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
+
+if (WIN32 AND NOT GLUT_FOUND)
+    find_library(GLUT_LIBRARY NAMES glut PATHS ${CMAKE_CURRENT_SOURCE_DIR})
+    find_library(GLUT32_LIBRARY NAMES glut32 PATHS ${CMAKE_CURRENT_SOURCE_DIR})
+endif()
+
 find_package(OpenMP)
 
 if (OPENMP_FOUND)
@@ -19,4 +25,8 @@ set( SB_SRCS
 
 add_executable(scriptbots ${SB_SRCS})
 
-target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+if (WIN32 AND NOT GLUT_FOUND)
+    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLUT32_LIBRARY})
+else()
+    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+endif()
