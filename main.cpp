@@ -20,7 +20,11 @@ TODO:
 #include <ctime>
 #include <string>
 #include <iostream>
-#include <omp.h>
+
+#include "config.h" // tells us whether we have openmp or not
+#ifdef HAVE_OPENMP
+    #include <omp.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
