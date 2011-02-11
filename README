@@ -7,7 +7,7 @@ To compile scriptbots you will need:
 * OpenGL and GLUT (http://www.opengl.org/resources/libraries/glut/)
 * * Linux: freeglut (http://freeglut.sourceforge.net/) 
 
-To build ScriptBots:
+To build ScriptBots on Linux:
 $ cd path/to/source
 $ mkdir build
 $ cd build
