@@ -1,24 +1,6 @@
 #include "DWRAONBrain.h"
 using namespace std;
-class Box {
-public:
 
-    Box();
-
-    //props
-    int type; //0: AND, 1:OR
-    float kp; //kp: damping strength
-    vector<float> w; //weight of each connecting box (in [0,inf])
-    vector<int> id; //id in boxes[] of the connecting box
-    vector<bool> notted; //is this input notted before coming in?
-    float bias;
-
-    //state variables
-    float target; //target value this node is going toward
-    float out; //current output, and history. 0 is farthest back. -1 is latest
-
-
-};
 
 Box::Box()
 {
@@ -75,6 +57,20 @@ DWRAONBrain::DWRAONBrain()
     //do other initializations
     init();
 }
+
+DWRAONBrain::DWRAONBrain(const DWRAONBrain& other)
+{
+    boxes = other.boxes;
+}
+
+DWRAONBrain& DWRAONBrain::operator=(const DWRAONBrain& other)
+{
+    if( this != &other )
+        boxes = other.boxes;
+    return *this;
+}
+
+
 void DWRAONBrain::init()
 {
 
@@ -138,3 +134,68 @@ void DWRAONBrain::tick(vector< float >& in, vector< float >& out)
         out[i]= boxes[BRAINSIZE-1-i].out;
     }
 }
+
+void DWRAONBrain::mutate(float MR, float MR2)
+{
+    for (int j=0;j<BRAINSIZE;j++) {
+
+        if (randf(0,1)<MR*3) {
+            boxes[j].bias+= randn(0, MR2);
+//             a2.mutations.push_back("bias jiggled\n");
+        }
+
+        if (false && randf(0,1)<MR*3) {
+            boxes[j].kp+= randn(0, MR2);
+            if (boxes[j].kp<0.01) boxes[j].kp=0.01;
+            if (boxes[j].kp>1) boxes[j].kp=1;
+//             a2.mutations.push_back("kp jiggled\n");
+        }
+
+        if (randf(0,1)<MR*3) {
+            int rc= randi(0, CONNS);
+            boxes[j].w[rc]+= randn(0, MR2);
+            if (boxes[j].w[rc]<0.01) boxes[j].w[rc]= 0.01;
+//             a2.mutations.push_back("weight jiggled\n");
+        }
+
+        //more unlikely changes here
+        if (randf(0,1)<MR) {
+            int rc= randi(0, CONNS);
+            int ri= randi(0,BRAINSIZE);
+            boxes[j].id[rc]= ri;
+//             a2.mutations.push_back("connectivity changed\n");
+        }
+
+        if (randf(0,1)<MR) {
+            int rc= randi(0, CONNS);
+            boxes[j].notted[rc]= !boxes[j].notted[rc];
+//             a2.mutations.push_back("notted was flipped\n");
+        }
+
+        if (randf(0,1)<MR) {
+            boxes[j].type= 1-boxes[j].type;
+//             a2.mutations.push_back("type of a box was changed\n");
+        }
+    }
+}
+
+DWRAONBrain DWRAONBrain::crossover(const DWRAONBrain& other)
+{
+    //this could be made faster by returning a pointer
+    //instead of returning by value
+    DWRAONBrain newbrain(*this);
+    
+    for (int i=0;i<newbrain.boxes.size(); i++) {
+        newbrain.boxes[i].bias= randf(0,1)<0.5 ? this->boxes[i].bias : other.boxes[i].bias;
+        newbrain.boxes[i].kp= randf(0,1)<0.5 ? this->boxes[i].kp : other.boxes[i].kp;
+        newbrain.boxes[i].type= randf(0,1)<0.5 ? this->boxes[i].type : other.boxes[i].type;
+
+        for (int j=0;j<newbrain.boxes[i].id.size();j++) {
+            newbrain.boxes[i].id[j] = randf(0,1)<0.5 ? this->boxes[i].id[j] : other.boxes[i].id[j];
+            newbrain.boxes[i].notted[j] = randf(0,1)<0.5 ? this->boxes[i].notted[j] : other.boxes[i].notted[j];
+            newbrain.boxes[i].w[j] = randf(0,1)<0.5 ? this->boxes[i].w[j] : other.boxes[i].w[j];
+        }
+    }
+    return newbrain;
+}
+

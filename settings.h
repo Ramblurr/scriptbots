@@ -34,7 +34,6 @@ namespace conf {
     const float FOODTRANSFER= 0.001; //how much is transfered between two agents trading food? per iteration
     const float FOOD_SHARING_DISTANCE= 50; //how far away is food shared between bots?
 
-    int CLOSED=0; //if environment is closed, then no random bots are added per time interval
 
     const float FOOD_DISTRIBUTION_RADIUS=100; //when bot is killed, how far is its body distributed?
 

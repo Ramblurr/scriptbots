@@ -20,12 +20,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DI
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
 
 set( SB_SRCS
-    main.cpp
+    #   main.cpp
     DWRAONBrain.cpp
     Agent.cpp
+    World.cpp
     vmath.cpp )
 
-add_executable(scriptbots ${SB_SRCS})
+add_executable(scriptbots  ${SB_SRCS})
 
 if (WIN32 AND NOT GLUT_FOUND)
     target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLUT32_LIBRARY})

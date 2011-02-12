@@ -1,13 +1,15 @@
 #ifndef HELPERS_H
 #define HELPERS_H
+#include <stdlib.h>
+#include <math.h>
 //uniform random in [a,b)
-float randf(float a, float b){return ((b-a)*((float)rand()/RAND_MAX))+a;}
+inline float randf(float a, float b){return ((b-a)*((float)rand()/RAND_MAX))+a;}
 
 //uniform random int in [a,b)
-int randi(int a, int b){return (rand()%(b-a))+a;}
+inline int randi(int a, int b){return (rand()%(b-a))+a;}
 
 //normalvariate random N(mu, sigma)
-double randn(double mu, double sigma) {
+inline double randn(double mu, double sigma) {
 	static bool deviateAvailable=false;	//	flag
 	static float storedDeviate;			//	deviate from previous calculation
 	double polar, rsquared, var1, var2;
@@ -29,7 +31,7 @@ double randn(double mu, double sigma) {
 }
 
 //cap value between 0 and 1
-float cap(float a){ 
+inline float cap(float a){ 
 	if (a<0) return 0;
 	if (a>1) return 1;
 	return a;

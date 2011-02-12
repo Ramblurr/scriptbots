@@ -1,21 +1,27 @@
 #ifndef AGENT_H
 #define AGENT_H
+
+#include "DWRAONBrain.h"
 #include "vmath.h"
+
 #include <vector>
 #include <string>
+
 class Agent
 {
 
 public:
     Agent();
-    Agent(const Agent& other);
-    virtual ~Agent();
-    virtual Agent& operator=(const Agent& other);
-    virtual bool operator==(const Agent& other) const;
+    
     
     void printSelf();
      //for drawing purposes
     void initEvent(float size, float r, float g, float b);
+    
+    void tick();
+    Agent reproduce(float MR, float MR2);
+    Agent crossover(const Agent &other);
+    
     Vector2f pos;
 
     float health; //in [0,2]. I cant remember why.
