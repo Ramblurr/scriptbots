@@ -29,22 +29,15 @@ TODO:
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "DWRAONBrain.h"
+#include "Agent.h"
+
 #include "vmath.h"
 #include "settings.h"
 #include "helpers.h"
 using namespace std;
 
 #pragma warning( once : 4018 )
-
-#define INPUTSIZE 20
-#define OUTPUTSIZE 9
-
-#define WIDTH 1800 //width and height of simulation
-#define HEIGHT 1000
-#define WWIDTH 1800 //window width and height
-#define WHEIGHT 1000
-#define CZ 50 //cell size in pixels, for food squares. Should divide well into Width Height
-
 
 
 //for fps
@@ -68,9 +61,9 @@ int epoch=0;
 int modcounter=0;
 
 //food
-int FW= WIDTH/CZ;
-int FH= HEIGHT/CZ;
-float food[WIDTH/CZ][HEIGHT/CZ];
+int FW= conf::WIDTH/conf::CZ;
+int FH= conf::HEIGHT/conf::CZ;
+float food[conf::WIDTH/conf::CZ][conf::HEIGHT/conf::CZ];
 int fx=0;
 int fy=0;
 
@@ -80,236 +73,6 @@ int fy=0;
 //int kills= 0;
 //int deaths= 0;
 
-#define BRAINSIZE 100
-#define CONNS 3
-class Box{
-public:
-	
-	//props
-	int type; //0: AND, 1:OR
-	float kp; //kp: damping strength
-	vector<float> w; //weight of each connecting box (in [0,inf])
-	vector<int> id; //id in boxes[] of the connecting box
-	vector<bool> notted; //is this input notted before coming in?
-	float bias;
-
-	//state variables
-	float target; //target value this node is going toward
-	float out; //current output, and history. 0 is farthest back. -1 is latest
-	
-	Box(){
-		
-		w.resize(CONNS,0);
-		id.resize(CONNS,0);
-		notted.resize(CONNS,0);
-
-		//constructor
-		for(int i=0;i<CONNS;i++){
-			w[i]= randf(0.1,2);
-			id[i]= randi(0,BRAINSIZE);
-			if(randf(0,1)<0.2) id[i]= randi(0,INPUTSIZE); //20% of the brain AT LEAST should connect to input.
-			notted[i]= randf(0,1)<0.5;
-		}
-
-		type= (randf(0,1)>0.5)?(0):(1);
-		kp= randf(0.8,1);
-		bias= randf(-1,1);
-
-		out=0;
-		target=0;
-	}
-};
-class DWRAONBrain{ //Damped Weighted Recurrent AND/OR Network
-public:
-	
-	vector<Box> boxes;
-	DWRAONBrain(){
-		
-		//constructor
-		for(int i=0;i<BRAINSIZE;i++) {
-			Box a; //make a random box and copy it over
-			boxes.push_back(a);
-
-			boxes[i].out= a.out;
-			boxes[i].target= a.target;
-			boxes[i].type= a.type;
-			boxes[i].bias= a.bias;
-			for(int j=0;j<CONNS;j++){
-				boxes[i].notted[j]= a.notted[j];
-				boxes[i].w[j]= a.w[j];
-				boxes[i].id[j]= a.id[j];
-
-				if(randf(0,1)<0.05) boxes[i].id[j]=0;
-				if(randf(0,1)<0.05) boxes[i].id[j]=5;
-				if(randf(0,1)<0.05) boxes[i].id[j]=12;
-				if(randf(0,1)<0.05) boxes[i].id[j]=4;
-
-				//boxes[i].id[j]= max(min(BRAINSIZE-1, randi(i-10,i+10)), 0);
-				if(i<BRAINSIZE/2){
-					boxes[i].id[j]= randi(0,INPUTSIZE);
-				}
-			}
-		}
-
-		//do other initializations
-		init();
-	}
-
-	void init(){
-	}
-
-	void tick(vector<float>& in, vector<float>& out){
-		
-		//do a single tick of the brain
-		
-		//take first few boxes and set their out to in[].
-		for(int i=0;i<INPUTSIZE;i++){
-			boxes[i].out= in[i];
-		}
-
-		//then do a dynamics tick and set all targets
-		for(int i=INPUTSIZE;i<BRAINSIZE;i++){
-			Box* abox= &boxes[i];
-
-			if(abox->type==0){
-
-				//AND NODE
-				float res=1;
-				for(int j=0;j<CONNS;j++){
-					int idx=abox->id[j];
-					float val= boxes[idx].out;
-					if(abox->notted[j]) val= 1-val;
-					//res= res * pow(val, abox->w[j]);
-					res= res * val;
-				}
-				res*= abox->bias;
-				abox->target= res;
-				
-			} else {
-				
-				//OR NODE
-				float res=0;
-				for(int j=0;j<CONNS;j++){
-					int idx=abox->id[j];
-					float val= boxes[idx].out;
-					if(abox->notted[j]) val= 1-val;
-					res= res + val*abox->w[j];
-				}
-				res+= abox->bias;
-				abox->target= res;
-			}
-
-			//clamp target
-			if(abox->target<0) abox->target=0;
-			if(abox->target>1) abox->target=1;
-		}
-
-		//make all boxes go a bit toward target
-		for(int i=INPUTSIZE;i<BRAINSIZE;i++){
-			Box* abox= &boxes[i];
-			abox->out =abox->out + (abox->target-abox->out)*abox->kp;
-		}
-
-		//finally set out[] to the last few boxes output
-		for(int i=0;i<OUTPUTSIZE;i++){
-			out[i]= boxes[BRAINSIZE-1-i].out;
-		}
-	}
-};
-
-class Agent{
-public:
-	Vector2f pos;
-
-	float health; //in [0,2]. I cant remember why.
-	float angle; //of the bot
-	
-	float red;
-	float gre;
-	float blu;
-	
-	float w1; //wheel speeds
-	float w2;
-	bool boost; //is this agent boosting
-
-	float spikeLength;
-	int age;
-
-	vector<float> in; //input: 2 eyes, sensors for R,G,B,proximity each, then Sound, Smell, Health
-	vector<float> out; //output: Left, Right, R, G, B, SPIKE
-
-	float repcounter; //when repcounter gets to 0, this bot reproduces
-	int gencount; //generation counter
-	bool hybrid; //is this agent result of crossover?
-	float clockf1, clockf2; //the frequencies of the two clocks of this bot
-	float soundmul; //sound multiplier of this bot. It can scream, or be very sneaky. This is actually always set to output 8
-	//variables for drawing purposes
-	float indicator;
-	float ir;float ig;float ib; //indicator colors
-	int selectflag; //is this agent selected?
-	float dfood; //what is change in health of this agent due to giving/receiving?
-
-	float give;    //is this agent attempting to give food to other agent?
-
-	int id; 
-
-	//inhereted stuff
-	float herbivore; //is this agent a herbivore? between 0 and 1
-	float MUTRATE1; //how often do mutations occur?
-	float MUTRATE2; //how significant are they?
-
-	DWRAONBrain brain; //THE BRAIN!!!!
-
-	Agent(){
-		//constructor
-		pos= Vector2f(randf(0,WIDTH),randf(0,HEIGHT));
-		angle= randf(-M_PI,M_PI);
-		health= 1.0+randf(0,0.1);
-		age=0;
-		spikeLength=0;
-		red= 0;
-		gre= 0;
-		blu= 0;
-		w1=0;
-		w2=0;
-		soundmul=1;
-		give=0;
-		clockf1= randf(5,100);
-		clockf2= randf(5,100);
-		boost=false;
-		indicator=0;
-		gencount=0;
-		selectflag=0;
-		ir=0;ig=0;ib=0;
-		hybrid= false;
-		herbivore= randf(0,1);
-		repcounter= herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
-		
-		id=0;
-
-		MUTRATE1= 0.003; 
-		MUTRATE2= 0.05; 
-
-		in.resize(INPUTSIZE, 0);
-		out.resize(OUTPUTSIZE, 0);
-	}
-
-	//will store the mutations that this agent has from its parent
-	//can be used to tune the mutation rate
-	vector<string> mutations; 
-	void printSelf(){
-		printf("Agent age=%i\n", age);
-		for(int i=0;i<mutations.size();i++){
-			cout << mutations[i];
-		}
-	}
-
-	void initEvent(float size, float r, float g, float b){ //for drawing purposes
-		indicator=size;
-		ir=r;ig=g;ib=b;
-	}
-};
-
 vector<Agent> agents;
 
 void changeSize(int w, int h) {
@@ -317,7 +80,7 @@ void changeSize(int w, int h) {
 	// Reset the coordinate system before modifying
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0,WWIDTH,WHEIGHT,0,0,1);
+	glOrtho(0,conf::WWIDTH,conf::WHEIGHT,0,0,1);
 }
 
 void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
@@ -350,10 +113,10 @@ void renderScene() {
 			for(int j=0;j<FH;j++){
 				float f= 0.5*food[i][j]/conf::FOODMAX;
 				glColor3f(0.9-f,0.9-f,1.0-f);
-				glVertex3f(i*CZ,j*CZ,0);
-				glVertex3f(i*CZ+CZ,j*CZ,0);
-				glVertex3f(i*CZ+CZ,j*CZ+CZ,0);
-				glVertex3f(i*CZ,j*CZ+CZ,0);
+				glVertex3f(i*conf::CZ,j*conf::CZ,0);
+				glVertex3f(i*conf::CZ+conf::CZ,j*conf::CZ,0);
+				glVertex3f(i*conf::CZ+conf::CZ,j*conf::CZ+conf::CZ,0);
+				glVertex3f(i*conf::CZ,j*conf::CZ+conf::CZ,0);
 			}
 		}
 		glEnd();
@@ -575,8 +338,8 @@ void setInputs() {
 		a->in[11]= cap(a->health/2); //divide by 2 since health is in [0,2]
 
 		//FOOD
-		int cx= (int) a->pos.x/CZ;
-		int cy= (int) a->pos.y/CZ;
+		int cx= (int) a->pos.x/conf::CZ;
+		int cy= (int) a->pos.y/conf::CZ;
 		a->in[4]= food[cx][cy]/conf::FOODMAX;
 
 		//SOUND SMELL EYES
@@ -754,17 +517,17 @@ void processOutputs(){
 		if(a->angle>M_PI) a->angle= -M_PI + (a->angle-M_PI);
 
 		//wrap around the map
-		if(a->pos.x<0) a->pos.x= WIDTH+a->pos.x;
-		if(a->pos.x>=WIDTH) a->pos.x= a->pos.x-WIDTH;
-		if(a->pos.y<0) a->pos.y= HEIGHT+a->pos.y;
-		if(a->pos.y>=HEIGHT) a->pos.y= a->pos.y-HEIGHT;
+		if(a->pos.x<0) a->pos.x= conf::WIDTH+a->pos.x;
+		if(a->pos.x>=conf::WIDTH) a->pos.x= a->pos.x-conf::WIDTH;
+		if(a->pos.y<0) a->pos.y= conf::HEIGHT+a->pos.y;
+		if(a->pos.y>=conf::HEIGHT) a->pos.y= a->pos.y-conf::HEIGHT;
 	}
 	
 	//process food intake for herbivors
 	for(int i=0;i<agents.size();i++){
 		
-		int cx= (int) agents[i].pos.x/CZ;
-		int cy= (int) agents[i].pos.y/CZ;
+		int cx= (int) agents[i].pos.x/conf::CZ;
+		int cy= (int) agents[i].pos.y/conf::CZ;
 		float f= food[cx][cy];
 		if(f>0 && agents[i].health<2){
 			//agent eats the food
@@ -852,10 +615,10 @@ void reproduce(int ai, float MR, float MR2){
 		Vector2f fb(conf::BOTRADIUS,0);
 		fb.rotate(-a2.angle);
 		a2.pos= agents[ai].pos + fb + Vector2f(randf(-conf::BOTRADIUS*2,conf::BOTRADIUS*2), randf(-conf::BOTRADIUS*2,conf::BOTRADIUS*2)); 
-		if(a2.pos.x<0) a2.pos.x= WIDTH+a2.pos.x;
-		if(a2.pos.x>=WIDTH) a2.pos.x= a2.pos.x-WIDTH;
-		if(a2.pos.y<0) a2.pos.y= HEIGHT+a2.pos.y;
-		if(a2.pos.y>=HEIGHT) a2.pos.y= a2.pos.y-HEIGHT;
+		if(a2.pos.x<0) a2.pos.x= conf::WIDTH+a2.pos.x;
+		if(a2.pos.x>=conf::WIDTH) a2.pos.x= a2.pos.x-conf::WIDTH;
+		if(a2.pos.y<0) a2.pos.y= conf::HEIGHT+a2.pos.y;
+		if(a2.pos.y>=conf::HEIGHT) a2.pos.y= a2.pos.y-conf::HEIGHT;
 
 		a2.gencount= agents[ai].gencount+1;
 		a2.repcounter= a2.herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-a2.herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
@@ -1217,7 +980,7 @@ int main(int argc, char **argv) {
 	//for(int k=0;k<500;k++) reproduce(0, 100*agents[0].MUTRATE1, 100*agents[0].MUTRATE2);
 
 	//inititalize food layer
-	if(WIDTH%CZ!=0 || HEIGHT%CZ!=0) printf("CAREFUL! The cell size variable CZ should divide evenly into  both WIDTH and HEIGHT! It doesn't right now!");
+	if(conf::WIDTH%conf::CZ!=0 || conf::HEIGHT%conf::CZ!=0) printf("CAREFUL! The cell size variable conf::CZ should divide evenly into  both conf::WIDTH and conf::HEIGHT! It doesn't right now!");
 	printf("p= pause, d= toggle drawing (for faster computation), f= draw food too, += faster, -= slower");
 	for(int x=0;x<FW;x++){
 		for(int y=0;y<FH;y++){
@@ -1229,7 +992,7 @@ int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(30,30);
-	glutInitWindowSize(WWIDTH,WHEIGHT);
+	glutInitWindowSize(conf::WWIDTH,conf::WHEIGHT);
 	glutCreateWindow("TEST");
 	glClearColor(0.9f, 0.9f, 1.0f, 0.0f);
 	glutDisplayFunc(renderScene);

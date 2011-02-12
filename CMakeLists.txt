@@ -21,6 +21,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_IN
 
 set( SB_SRCS
     main.cpp
+    DWRAONBrain.cpp
+    Agent.cpp
     vmath.cpp )
 
 add_executable(scriptbots ${SB_SRCS})

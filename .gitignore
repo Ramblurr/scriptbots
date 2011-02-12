@@ -1,4 +1,5 @@
 *~
+*.swp*
 *.kdev4
 Debug/
 Release/

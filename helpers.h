@@ -1,3 +1,5 @@
+#ifndef HELPERS_H
+#define HELPERS_H
 //uniform random in [a,b)
 float randf(float a, float b){return ((b-a)*((float)rand()/RAND_MAX))+a;}
 
@@ -32,3 +34,4 @@ float cap(float a){
 	if (a>1) return 1;
 	return a;
 }
+#endif

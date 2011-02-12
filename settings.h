@@ -1,4 +1,13 @@
+#ifndef SETTINGS_H
+#define SETTINGS_H
 namespace conf {
+    
+    const int WIDTH = 1800;  //width and height of simulation
+    const int HEIGHT = 1000;
+    const int WWIDTH = 1800;  //window width and height
+    const int WHEIGHT = 1000;
+    
+    const int CZ = 50; //cell size in pixels, for food squares. Should divide well into Width Height
     
     const int NUMBOTS=30; //initially, and minimally
     const float BOTRADIUS=10; //for drawing
@@ -30,3 +39,4 @@ namespace conf {
     const float FOOD_DISTRIBUTION_RADIUS=100; //when bot is killed, how far is its body distributed?
 
 }
+#endif
