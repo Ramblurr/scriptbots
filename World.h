@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "View.h"
 #include "Agent.h"
 #include "settings.h"
 #include <vector>
@@ -10,8 +11,16 @@ class World
 public:
     World();
     ~World();
-private:
+    
     void update();
+    void reset();
+    
+    void draw(View* view);
+    
+    bool isClosed() const;
+    void setClosed(bool close);
+    
+private:
     void setInputs();
     void processOutputs();
     void brainsTick();  //takes in[] to out[] for every agent
@@ -21,7 +30,6 @@ private:
     void reproduce(int ai, float MR, float MR2);
     void addNewByCrossover();
     void addRandomBots(int num);
-    
     
     int modcounter;
     int epoch;
@@ -35,7 +43,7 @@ private:
     int fx;
     int fy;
     float food[conf::WIDTH/conf::CZ][conf::HEIGHT/conf::CZ];
-    int CLOSED; //if environment is closed, then no random bots are added per time interval
+    bool CLOSED; //if environment is closed, then no random bots are added per time interval
 };
 
 #endif // WORLD_H

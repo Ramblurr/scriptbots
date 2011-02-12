@@ -20,7 +20,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DI
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
 
 set( SB_SRCS
-    #   main.cpp
+    View.cpp
+    GLView.cpp
+    main.cpp
     DWRAONBrain.cpp
     Agent.cpp
     World.cpp

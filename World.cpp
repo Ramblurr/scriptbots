@@ -14,8 +14,16 @@ World::World() :
         idcounter(0),
         FW(conf::WIDTH/conf::CZ),
         FH(conf::HEIGHT/conf::CZ),
-        CLOSED(0)
+        CLOSED(false)
 {
+    addRandomBots(conf::NUMBOTS);
+    //inititalize food layer
+
+    for(int x=0;x<FW;x++){
+        for(int y=0;y<FH;y++){
+            food[x][y]= 0;
+        }
+    }
 }
 
 void World::update()
@@ -122,7 +130,7 @@ void World::update()
     }
 
     //add new agents, if environment isn't closed
-    if (CLOSED==0) {
+    if (!CLOSED) {
         //make sure environment is always populated with at least NUMBOTS bots
         if (agents.size()<conf::NUMBOTS
            ) {
@@ -477,7 +485,7 @@ void World::addNewByCrossover()
 
     Agent* a1= &agents[i1];
     Agent* a2= &agents[i2];
-    
+
 
     //cross brains
     Agent anew = a1->crossover(*a2);
@@ -513,3 +521,31 @@ void World::writeReport()
 {
 
 }
+
+
+void World::reset()
+{
+    agents.clear();
+    addRandomBots(conf::NUMBOTS);
+}
+
+void World::setClosed(bool close)
+{
+    CLOSED = close;
+}
+
+bool World::isClosed() const
+{
+    return CLOSED;
+}
+
+
+void World::draw(View* view)
+{
+    vector<Agent>::const_iterator it;
+    for( it = agents.begin(); it != agents.end(); ++it) {
+        view->drawAgent(*it);
+    }
+        
+}
+
