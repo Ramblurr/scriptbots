@@ -95,6 +95,7 @@ void GLView::changeSize(int w, int h)
 // };
 void GLView::processMouse(int button, int state, int x, int y)
 {
+    // TODO Fix the mouse processing 
 //     if (state==0) {
 //         float mind=1e10;
 //         float mini=-1;
@@ -269,6 +270,7 @@ void GLView::drawAgent(const Agent& agent)
         glEnd();
     }
 
+    //TODO Fix event drawing
     //draw indicator of this agent... used for various events
 //     if (agent.indicator>0) {
 //         glBegin(GL_POLYGON);
