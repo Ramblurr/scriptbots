@@ -500,7 +500,23 @@ void World::reproduce(int ai, float MR, float MR2)
 
 void World::writeReport()
 {
-
+    //TODO fix reporting
+    //save all kinds of nice data stuff
+//     int numherb=0;
+//     int numcarn=0;
+//     int topcarn=0;
+//     int topherb=0;
+//     for(int i=0;i<agents.size();i++){
+//         if(agents[i].herbivore>0.5) numherb++;
+//         else numcarn++;
+// 
+//         if(agents[i].herbivore>0.5 && agents[i].gencount>topherb) topherb= agents[i].gencount;
+//         if(agents[i].herbivore<0.5 && agents[i].gencount>topcarn) topcarn= agents[i].gencount;
+//     }
+// 
+//     FILE* fp = fopen("report.txt", "a");
+//     fprintf(fp, "%i %i %i %i\n", numherb, numcarn, topcarn, topherb);
+//     fclose(fp);
 }
 
 
