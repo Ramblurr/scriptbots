@@ -4,7 +4,6 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 if (WIN32 AND NOT GLUT_FOUND)
-    find_library(GLUT_LIBRARY NAMES glut PATHS ${CMAKE_CURRENT_SOURCE_DIR})
     find_library(GLUT32_LIBRARY NAMES glut32 PATHS ${CMAKE_CURRENT_SOURCE_DIR})
     SET (LOCAL_GLUT32 1)
 endif()
@@ -32,7 +31,7 @@ set( SB_SRCS
 add_executable(scriptbots  ${SB_SRCS})
 
 if (WIN32 AND NOT GLUT_FOUND)
-    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${GLUT32_LIBRARY})
+    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLUT32_LIBRARY})
 else()
-    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 endif()
