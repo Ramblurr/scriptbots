@@ -1,6 +1,6 @@
 #include "GLView.h"
 #include "World.h"
-
+#include <ctime>
 #include "config.h"
 #ifdef LOCAL_GLUT32
     #include "glut.h"
