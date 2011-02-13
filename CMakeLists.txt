@@ -35,3 +35,13 @@ if (WIN32 AND NOT GLUT_FOUND)
 else()
     target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 endif()
+
+# copy glut32.dll to the output dirs
+# not sure how msvc could be true and win32 not, but just in case..
+if (MSVC AND WIN32 AND NOT GLUT_FOUND) 
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/Debug)
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/Release)
+    file(COPY glut32.dll DESTINATION ${PROJECT_BINARY_DIR}/Debug)
+    file(COPY glut32.dll DESTINATION ${PROJECT_BINARY_DIR}/Release)
+endif()
+
