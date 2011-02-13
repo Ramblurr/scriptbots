@@ -24,6 +24,7 @@ public:
     virtual ~GLView();
     
     virtual void drawAgent(const Agent &a);
+    virtual void drawFood(int x, int y, float quantity);
     
     void setWorld(World* w);
     
@@ -41,7 +42,7 @@ private:
     bool paused;
     bool draw;
     int skipdraw;
-    bool drawFood;
+    bool drawfood;
     char buf[100];
     char buf2[10];
     int modcounter;

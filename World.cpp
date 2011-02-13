@@ -521,8 +521,16 @@ bool World::isClosed() const
 }
 
 
-void World::draw(View* view)
+void World::draw(View* view, bool drawfood)
 {
+    if(drawfood) {
+        for(int i=0;i<FW;i++) {
+            for(int j=0;j<FH;j++) {
+                float f= 0.5*food[i][j]/conf::FOODMAX;
+                view->drawFood(i,j,f);
+            }
+        }
+    }
     vector<Agent>::const_iterator it;
     for ( it = agents.begin(); it != agents.end(); ++it) {
         view->drawAgent(*it);

@@ -2,9 +2,9 @@
 
 #include "config.h"
 #ifdef LOCAL_GLUT32
-    #include "glut.h"
+#include "glut.h"
 #else
-    #include <GL/glut.h>
+#include <GL/glut.h>
 #endif
 
 #include <stdio.h>
@@ -58,7 +58,7 @@ GLView::GLView(World *s) :
         paused(false),
         draw(true),
         skipdraw(1),
-        drawFood(false),
+        drawfood(true),
         modcounter(0),
         frames(0),
         lastUpdate(0)
@@ -142,7 +142,7 @@ void GLView::processNormalKeys(unsigned char key, int x, int y)
         //-
         skipdraw--;
     } else if (key=='f') {
-        drawFood=!drawFood;
+        drawfood=!drawfood;
     } else if (key=='c') {
         world->setClosed( !world->isClosed() );
         printf("Environemt closed now= %b\n",world->isClosed());
@@ -187,7 +187,7 @@ void GLView::renderScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
-    world->draw(this);
+    world->draw(this, drawfood);
 
     glPopMatrix();
     glutSwapBuffers();
@@ -389,6 +389,20 @@ void GLView::drawAgent(const Agent& agent)
     //repcounter
     sprintf(buf2, "%.2f", agent.repcounter);
     RenderString(agent.pos.x-conf::BOTRADIUS*1.5, agent.pos.y+conf::BOTRADIUS*1.8+36, GLUT_BITMAP_TIMES_ROMAN_24, buf2, 0.0f, 0.0f, 0.0f);
+}
+
+void GLView::drawFood(int x, int y, float quantity)
+{
+    //draw food
+    if (drawfood) {
+        glBegin(GL_QUADS);
+        glColor3f(0.9-quantity,0.9-quantity,1.0-quantity);
+        glVertex3f(x*conf::CZ,y*conf::CZ,0);
+        glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ,0);
+        glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ+conf::CZ,0);
+        glVertex3f(x*conf::CZ,y*conf::CZ+conf::CZ,0);
+        glEnd();
+    }
 }
 
 void GLView::setWorld(World* w)
