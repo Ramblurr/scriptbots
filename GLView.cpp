@@ -254,7 +254,6 @@ void GLView::drawAgent(const Agent& agent)
         glPopMatrix();
     }
 
-    /*
     //draw giving/receiving
     if(agent.dfood!=0){
         glBegin(GL_POLYGON);
@@ -269,7 +268,6 @@ void GLView::drawAgent(const Agent& agent)
         }
         glEnd();
     }
-    */
 
     //draw indicator of this agent... used for various events
 //     if (agent.indicator>0) {
