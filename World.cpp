@@ -10,7 +10,7 @@ using namespace std;
 
 World::World() :
         modcounter(0),
-        epoch(0),
+        current_epoch(0),
         idcounter(0),
         FW(conf::WIDTH/conf::CZ),
         FH(conf::HEIGHT/conf::CZ),
@@ -19,8 +19,8 @@ World::World() :
     addRandomBots(conf::NUMBOTS);
     //inititalize food layer
 
-    for(int x=0;x<FW;x++){
-        for(int y=0;y<FH;y++){
+    for (int x=0;x<FW;x++) {
+        for (int y=0;y<FH;y++) {
             food[x][y]= 0;
         }
     }
@@ -40,7 +40,7 @@ void World::update()
     if (modcounter%1000==0) writeReport();
     if (modcounter>=10000) {
         modcounter=0;
-        epoch++;
+        current_epoch++;
     }
     if (modcounter%conf::FOODADDFREQ==0) {
         fx=randi(0,FW);
@@ -145,27 +145,7 @@ void World::update()
         }
     }
 
-    //show FPS
-    /*int currentTime = glutGet( GLUT_ELAPSED_TIME );
-    frames++;
-    if ((currentTime - lastUpdate) >= 1000) {
-        int numherb=0;
-        int numcarn=0;
-        for (int i=0;i<agents.size();i++) {
-            if (agents[i].herbivore>0.5) numherb++;
-            else numcarn++;
-        }
-        sprintf( buf, "FPS: %d NumAgents: %d Carnivors: %d Herbivors: %d Epoch: %d", frames, agents.size(), numcarn, numherb, epoch );
-        glutSetWindowTitle( buf );
-        frames = 0;
-        lastUpdate = currentTime;
-    }
-    if (skipdraw<=0 && draw) {
-        clock_t endwait;
-        float mult=-0.005*(skipdraw-1); //ugly, ah well
-        endwait = clock () + mult * CLOCKS_PER_SEC ;
-        while (clock() < endwait) {}
-    }*/
+
 }
 
 void World::setInputs()
@@ -510,6 +490,7 @@ void World::reproduce(int ai, float MR, float MR2)
         idcounter++;
         agents.push_back(a2);
 
+        //TODO fix recording
         //record this
         //FILE* fp = fopen("log.txt", "a");
         //fprintf(fp, "%i %i %i\n", 1, this->id, a2.id); //1 marks the event: child is born
@@ -543,9 +524,31 @@ bool World::isClosed() const
 void World::draw(View* view)
 {
     vector<Agent>::const_iterator it;
-    for( it = agents.begin(); it != agents.end(); ++it) {
+    for ( it = agents.begin(); it != agents.end(); ++it) {
         view->drawAgent(*it);
     }
-        
+
+}
+
+std::pair< int,int > World::numHerbCarnivores() const
+{
+    int numherb=0;
+    int numcarn=0;
+    for (int i=0;i<agents.size();i++) {
+        if (agents[i].herbivore>0.5) numherb++;
+        else numcarn++;
+    }
+    
+    return std::pair<int,int>(numherb,numcarn);
+}
+
+int World::numAgents() const
+{
+    return agents.size();
+}
+
+int World::epoch() const
+{
+    return current_epoch;
 }
 

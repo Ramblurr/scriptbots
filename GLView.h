@@ -42,8 +42,11 @@ private:
     bool draw;
     int skipdraw;
     bool drawFood;
+    char buf[100];
     char buf2[10];
     int modcounter;
+    int lastUpdate;
+    int frames;
     
 };
 

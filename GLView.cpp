@@ -30,17 +30,17 @@ void gl_renderScene()
 
 
 void RenderString(float x, float y, void *font, const char* string, float r, float g, float b)
-{  
-  glColor3f(r,g,b); 
-  glRasterPos2f(x, y);
-  int len = (int) strlen(string);
-  for (int i = 0; i < len; i++)
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[i]);
+{
+    glColor3f(r,g,b);
+    glRasterPos2f(x, y);
+    int len = (int) strlen(string);
+    for (int i = 0; i < len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, string[i]);
 }
 
-void drawCircle(float x, float y, float r){
+void drawCircle(float x, float y, float r) {
     float n;
-    for (int k=0;k<17;k++){
+    for (int k=0;k<17;k++) {
         n = k*(M_PI/8);
         glVertex3f(x+r*sin(n),y+r*cos(n),0);
     }
@@ -53,7 +53,9 @@ GLView::GLView(World *s) :
         draw(true),
         skipdraw(1),
         drawFood(false),
-        modcounter(0)
+        modcounter(0),
+        frames(0),
+        lastUpdate(0)
 {
 
 }
@@ -147,21 +149,40 @@ void GLView::handleIdle()
 {
     modcounter++;
     if (!paused) world->update();
+
+    //show FPS
+    int currentTime = glutGet( GLUT_ELAPSED_TIME );
+    frames++;
+    if ((currentTime - lastUpdate) >= 1000) {
+        std::pair<int,int> num_herbs_carns = world->numHerbCarnivores();
+        sprintf( buf, "FPS: %d NumAgents: %d Carnivors: %d Herbivors: %d Epoch: %d", frames, world->numAgents(), num_herbs_carns.second, num_herbs_carns.first, world->epoch() );
+        glutSetWindowTitle( buf );
+        frames = 0;
+        lastUpdate = currentTime;
+    }
+    if (skipdraw<=0 && draw) {
+        clock_t endwait;
+        float mult=-0.005*(skipdraw-1); //ugly, ah well
+        endwait = clock () + mult * CLOCKS_PER_SEC ;
+        while (clock() < endwait) {}
+    }
+
     if (draw) {
         if (skipdraw>0) {
             if (modcounter%skipdraw==0) renderScene();    //increase fps by skipping drawing
         }
         else renderScene(); //we will decrease fps by waiting using clocks
     }
+
 }
 
 void GLView::renderScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
-    
+
     world->draw(this);
-    
+
     glPopMatrix();
     glutSwapBuffers();
 }

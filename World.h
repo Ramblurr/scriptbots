@@ -5,7 +5,6 @@
 #include "Agent.h"
 #include "settings.h"
 #include <vector>
-
 class World
 {
 public:
@@ -20,6 +19,17 @@ public:
     bool isClosed() const;
     void setClosed(bool close);
     
+    /**
+     * Returns the number of herbivores and 
+     * carnivores in the world.
+     * first : num herbs
+     * second : num carns
+     */
+    std::pair<int,int> numHerbCarnivores() const;
+    
+    int numAgents() const;
+    int epoch() const;
+    
 private:
     void setInputs();
     void processOutputs();
@@ -32,7 +42,7 @@ private:
     void addRandomBots(int num);
     
     int modcounter;
-    int epoch;
+    int current_epoch;
     int idcounter;
     
     std::vector<Agent> agents;
