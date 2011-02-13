@@ -6,6 +6,7 @@ find_package(GLUT REQUIRED)
 if (WIN32 AND NOT GLUT_FOUND)
     find_library(GLUT_LIBRARY NAMES glut PATHS ${CMAKE_CURRENT_SOURCE_DIR})
     find_library(GLUT32_LIBRARY NAMES glut32 PATHS ${CMAKE_CURRENT_SOURCE_DIR})
+    SET (LOCAL_GLUT32 1)
 endif()
 
 find_package(OpenMP)

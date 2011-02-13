@@ -1,5 +1,11 @@
 #include "GLView.h"
-#include "glut.h"
+
+#include "config.h"
+#ifdef LOCAL_GLUT32
+    #include "glut.h"
+#else
+    #include <GL/glut.h>
+#endif
 
 #include <stdio.h>
 

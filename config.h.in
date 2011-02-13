@@ -1,2 +1,2 @@
 #cmakedefine HAVE_OPENMP
-
+#cmakedefine LOCAL_GLUT32
