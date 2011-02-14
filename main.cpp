@@ -1,7 +1,11 @@
 #include "GLView.h"
 #include "World.h"
+
 #include <ctime>
+
 #include "config.h"
+
+
 #ifdef LOCAL_GLUT32
     #include "glut.h"
 #else
@@ -10,13 +14,12 @@
 
 #include <stdio.h>
 
+#include "gui/MainWindow.h"
+#include <QApplication>
 
 GLView* GLVIEW = new GLView(0);
-int main(int argc, char **argv) {
-    srand(time(0));
-    if (conf::WIDTH%conf::CZ!=0 || conf::HEIGHT%conf::CZ!=0) printf("CAREFUL! The cell size variable conf::CZ should divide evenly into  both conf::WIDTH and conf::HEIGHT! It doesn't right now!");
-    printf("p= pause, d= toggle drawing (for faster computation), f= draw food too, += faster, -= slower");
-    
+
+void doGlut(int argc, char **argv) {
     World* world = new World();
     GLVIEW->setWorld(world);
 
@@ -36,5 +39,25 @@ int main(int argc, char **argv) {
     glutMotionFunc(gl_processMouseActiveMotion);
 
     glutMainLoop();
+}
+
+void doQt(int argc, char **argv) {
+    
+    QApplication app( argc, argv );
+    World* world = new World();
+    MainWindow foo(world);
+    foo.show();
+    app.exec();
+}
+
+int main(int argc, char **argv) {
+    srand(time(0));
+    if (conf::WIDTH%conf::CZ!=0 || conf::HEIGHT%conf::CZ!=0) printf("CAREFUL! The cell size variable conf::CZ should divide evenly into  both conf::WIDTH and conf::HEIGHT! It doesn't right now!");
+    printf("p= pause, d= toggle drawing (for faster computation), f= draw food too, += faster, -= slower");
+    
+    if(0) doGlut(argc,argv);
+    else doQt(argc, argv);
+    
+    
     return 0;
 }

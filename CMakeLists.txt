@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
+FIND_PACKAGE( Qt4 4.6.0 COMPONENTS QtGui QtCore QtGl REQUIRED )
+
 if (WIN32 AND NOT GLUT_FOUND)
     find_library(GLUT32_LIBRARY NAMES glut32 PATHS ${CMAKE_CURRENT_SOURCE_DIR})
     SET (LOCAL_GLUT32 1)
@@ -15,6 +17,11 @@ if (OPENMP_FOUND)
     SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 endif()
+
+SET( QT_USE_QTOPENGL TRUE )
+
+INCLUDE( ${QT_USE_FILE} )
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
@@ -27,13 +34,23 @@ set( SB_SRCS
     Agent.cpp
     World.cpp
     vmath.cpp )
+set( sbGUI_SRCS 
+    gui/GLDrawer.cpp 
+    gui/MainWindow.cpp
+    )
+set( sbGUI_Headers
+    gui/MainWindow.h
+)
 
-add_executable(scriptbots  ${SB_SRCS})
+# qt4_wrap_ui( tomahawkUI_H ${tomahawkUI} )
+qt4_wrap_cpp( sbMoc ${sbGUI_Headers} )
+
+add_executable(scriptbots  ${SB_SRCS} ${sbGUI_SRCS} ${sbMoc})
 
 if (WIN32 AND NOT GLUT_FOUND)
-    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLUT32_LIBRARY})
+    target_link_libraries(scriptbots ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLUT32_LIBRARY})
 else()
-    target_link_libraries(scriptbots ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
+    target_link_libraries(scriptbots ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES})
 endif()
 
 # copy glut32.dll to the output dirs
