@@ -11,13 +11,14 @@ if(QT4_FOUND)
     INCLUDE( ${QT_USE_FILE} )
 
     set( sbGUI_SRCS 
-    #     SimulationController.cpp 
+        SimulationController.cpp 
         GLDrawer.cpp 
         MainWindow.cpp
     )
 
     set( sbGUI_Headers
         MainWindow.h
+        SimulationController.h
     )
 
     qt4_wrap_cpp( sbMoc ${sbGUI_Headers} )
