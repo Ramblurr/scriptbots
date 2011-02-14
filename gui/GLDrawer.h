@@ -3,8 +3,8 @@
 
 #include <QtOpenGL/qgl.h>
 
-#include "../World.h"
-#include "../View.h"
+#include "World.h"
+#include "View.h"
 
 
 class GLDrawer : public QGLWidget, public View

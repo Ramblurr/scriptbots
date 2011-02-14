@@ -3,7 +3,9 @@
 
 #include <QtGui/QMainWindow>
 
-#include "../World.h"
+#include "World.h"
+
+extern void doQt(int argc, char **argv);
 
 class GLDrawer;
 class MainWindow : public QMainWindow

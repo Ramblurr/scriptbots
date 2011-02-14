@@ -9,6 +9,28 @@
 
 #include <stdio.h>
 
+void doGlut(int argc, char **argv) {
+    World* world = new World();
+    GLVIEW->setWorld(world);
+
+    //GLUT SETUP
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowPosition(30,30);
+    glutInitWindowSize(conf::WWIDTH,conf::WHEIGHT);
+    glutCreateWindow("TEST");
+    glClearColor(0.9f, 0.9f, 1.0f, 0.0f);
+    glutDisplayFunc(gl_renderScene);
+    glutIdleFunc(gl_handleIdle);
+    glutReshapeFunc(gl_changeSize);
+
+    glutKeyboardFunc(gl_processNormalKeys);
+    glutMouseFunc(gl_processMouse);
+    glutMotionFunc(gl_processMouseActiveMotion);
+
+    glutMainLoop();
+}
+
 void gl_processNormalKeys(unsigned char key, int x, int y)
 {
     GLVIEW->processNormalKeys(key, x, y);

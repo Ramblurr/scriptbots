@@ -2,13 +2,14 @@
 #define GLVIEW_H
 
 
-#include "View.h"
-#include "World.h"
+#include "core/View.h"
+#include "core/World.h"
 
 class GLView;
 
 extern GLView* GLVIEW;
 
+void doGlut(int argc, char **argv);
 void gl_processNormalKeys(unsigned char key, int x, int y);
 void gl_processMouse(int button, int state, int x, int y);
 void gl_processMouseActiveMotion(int x, int y);

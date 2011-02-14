@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-#include "../settings.h"
+#include "settings.h"
 
 #include <QDebug>
 
