@@ -23,7 +23,13 @@ public:
     float kp; //kp: damping strength
     std::vector<float> w; //weight of each connecting box (in [0,inf]
     std::vector<int> id; //id in boxes[] of the connecting box
-    std::vector<bool> notted; //is this input notted before coming in?
+	/* changed from <bool> to <char> because vector<bool> doesn't 
+	   have true random access, and thus slows the simulation to a crawl.
+	   http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=98
+	   It still stores boolean values at the cost of space overhead,
+	   but with a significant speed improvement.
+	*/
+	std::vector<char> notted; //is this input notted before coming in?
     float bias;
 
     //state variables
