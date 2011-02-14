@@ -34,6 +34,7 @@ void GLDrawer::initializeGL()
 {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    glClearColor(0.9f, 0.9f, 1.0f, 0.0f);
     glOrtho(0,conf::WWIDTH,conf::WHEIGHT,0,0,1);
 }
 
@@ -43,6 +44,7 @@ void GLDrawer::resizeGL(int w, int h)
     glLoadIdentity();
     glClearColor(0.9f, 0.9f, 1.0f, 0.0f);
     glOrtho(0,conf::WWIDTH,conf::WHEIGHT,0,0,1);
+    glViewport(0,0,(GLsizei) w, (GLsizei) h);
 }
 
 void GLDrawer::paintGL()
