@@ -43,17 +43,17 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( this,        SIGNAL( resetSimulation() ), 
               mController, SLOT(   resetSimulation() ), Qt::QueuedConnection );
 
+    connect( this,        SIGNAL( toggleDrawing() ), 
+              mController, SLOT(   toggleDrawing() ), Qt::QueuedConnection );
+    
     connect( mController, SIGNAL( gameState(std::vector<Agent>) ), 
               mGLWidget,   SLOT(   storeState(std::vector<Agent> ) ), Qt::QueuedConnection );
     
-    /*connect( mController, SIGNAL( doDrawAgent( Agent ) ),
-              mGLWidget,   SLOT(   storeAgent ( Agent ) ), Qt::QueuedConnection );
-
-    connect( mController, SIGNAL( doDrawFood(int,int,float) ),
-              mGLWidget,   SLOT(   storeFood(int,int,float) ) );*/
+    connect( mController, SIGNAL( fps(int) ), 
+              this,   SLOT( slotFpsUpdate(int) ), Qt::QueuedConnection );
     
     mController->moveToThread(&mThread);
-    mThread.start();
+    mThread.start(QThread::HighestPriority);
     
 //     QTimer* t = new QTimer( this );
 //     t->start( 50 );
@@ -82,9 +82,24 @@ void MainWindow::setupToolbar()
                                 tr( "&Reset Simulation" ), 
                                 this, 
                                 SLOT( slotReset() ) );
-    mToolBar->addAction(runAct);
-    mToolBar->addAction(pauseAct);
-    mToolBar->addAction(resetAct);
+    QAction* toggleDrawAct = mToolBar->addAction( 
+                                QIcon::fromTheme( "media-seek-forward" ), 
+                                tr( "&Toggle Drawing" ), 
+                                this, 
+                                SLOT( slotToggleDrawing() ) );
+    
+    QAction* incrSkipAct = mToolBar->addAction( 
+                                QIcon::fromTheme( "list-add" ), 
+                                tr( "&Increment Skip" ), 
+                                mGLWidget, 
+                                SLOT( incrementSkip() ) );
+    
+    QAction* decrSkipAct = mToolBar->addAction( 
+                                QIcon::fromTheme( "list-remove" ), 
+                                tr( "&Decrement Skip" ), 
+                                mGLWidget, 
+                                SLOT( decrementSkip() ) );
+    
 //     menuBar()->addMenu("&Hi");
     
 }
@@ -109,5 +124,18 @@ void MainWindow::slotReset()
 {
     emit resetSimulation();
 }
+
+void MainWindow::slotToggleDrawing()
+{
+    emit toggleDrawing();
+}
+
+void MainWindow::slotFpsUpdate(int fps)
+{
+//     qDebug() << "fps:" << fps;
+    QString title = "FPS: " + QString::number(fps);
+    setWindowTitle(title);
+}
+
 
 // #include "MainWindow.moc"

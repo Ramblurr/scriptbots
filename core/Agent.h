@@ -12,6 +12,8 @@ class Agent
 
 public:
     Agent();
+    ~Agent();
+    Agent(const Agent &other );
     
     
     void printSelf();

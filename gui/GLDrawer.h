@@ -41,8 +41,8 @@ public:
     
 public slots:
     void storeState(const std::vector<Agent> &agents);
-    void storeAgent(const Agent &a);
-    void storeFood(int x, int y, float quantity);
+    void incrementSkip();
+    void decrementSkip();
     
 protected:
     virtual void initializeGL();

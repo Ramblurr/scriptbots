@@ -3,6 +3,10 @@
 # And builds either a Qt or GLUT based executable
 
 project(scriptbots)
+
+set( CMAKE_BUILD_TYPE Debug) 
+set( DEBUG_BUILD_TYPE ON )
+
 cmake_minimum_required(VERSION 2.8)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
@@ -36,6 +40,7 @@ add_subdirectory(gui)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${GLUT_INCLUDE_DIRS} )
 
+# set(QT4_FOUND 0 )
 if(QT4_FOUND)
     set(HAVE_QT 1)
     set(sb_LIBS 

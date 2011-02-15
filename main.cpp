@@ -5,6 +5,8 @@
 
 #include "config.h"
 
+// #include <QtCore/QTime>
+// #include "World.h"
 
 #ifdef LOCAL_GLUT32
     #include "glut.h"
@@ -30,7 +32,25 @@ int main(int argc, char **argv) {
 #else
     doGlut(argc,argv);
 #endif
-   
+//    World* w = new World();
+//    QTime t;
+//    t.start();
+//    int fps = 0;
+//    bool go = true;
+//    int foo = 0;
+//    while(1) {
+//        ++fps;
+//         w->update();
+//         int msec = t.elapsed();
+//         if( msec >= 1000 ) {
+//             foo += 1000;
+//             printf("fps: %d, %d\n", fps, foo);
+//             fps= 0;
+//             t.restart();
+//         }
+//         if( foo >= 30000 )
+//             return 1;
+//    }
     return 0;
 }
 

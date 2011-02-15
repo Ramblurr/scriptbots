@@ -14,7 +14,12 @@ public:
     void update();
     void reset();
     
+    bool isPaused() const;
+    void setPaused(bool pause);
+    
     void draw(View* view, bool drawfood);
+    
+    std::vector<Agent> getAgents();
     
     bool isClosed() const;
     void setClosed(bool close);
@@ -41,6 +46,7 @@ private:
     void addNewByCrossover();
     void addRandomBots(int num);
     
+    bool paused;
     int modcounter;
     int current_epoch;
     int idcounter;

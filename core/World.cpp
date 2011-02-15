@@ -9,6 +9,7 @@
 using namespace std;
 
 World::World() :
+        paused(false),
         modcounter(0),
         current_epoch(0),
         idcounter(0),
@@ -26,8 +27,19 @@ World::World() :
     }
 }
 
+bool World::isPaused() const
+{
+    return paused;
+}
+
+void World::setPaused(bool pause)
+{
+    paused = pause;
+}
+
 void World::update()
 {
+    if(paused) return;
     modcounter++;
 
     //Process periodic events
@@ -576,3 +588,7 @@ int World::epoch() const
     return current_epoch;
 }
 
+vector< Agent > World::getAgents()
+{
+    return agents;
+}

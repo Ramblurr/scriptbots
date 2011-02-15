@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "World.h"
+
 #include <QtGui/QMainWindow>
 #include <QtCore/QThread>
-#include "World.h"
 
 extern void doQt(int argc, char **argv);
 
@@ -20,16 +21,21 @@ public:
     ~MainWindow();
 
 //     virtual bool eventFilter( QObject* , QEvent* );
+    
+public slots:
+    void slotFpsUpdate(int);
 signals:
     void startSimulation();
     void pauseSimulation();
     void resetSimulation();
+    void toggleDrawing();
 
 private slots:
     void timeout();
     void slotStart();
     void slotPause();
     void slotReset();
+    void slotToggleDrawing();
     
 private:
     void setupToolbar();

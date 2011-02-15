@@ -43,6 +43,50 @@ Agent::Agent()
     out.resize(OUTPUTSIZE, 0);
 }
 
+Agent::~Agent()
+{
+
+}
+
+Agent::Agent(const Agent& a)
+{
+    pos= a.pos;
+    angle= a.angle;
+    health= a.health;
+    age=a.age;
+    spikeLength=a.spikeLength;
+    red= a.red;
+    gre= a.gre;
+    blu= a.blu;
+    w1=a.w1;
+    w2=a.w2;
+    soundmul=a.soundmul;
+    give=a.give;
+    clockf1= a.clockf1;
+    clockf2= a.clockf2;
+    boost=a.boost;
+    indicator=a.indicator;
+    gencount=a.gencount;
+    selectflag=a.selectflag;
+    ir=a.ir;
+    ig=a.ig;
+    ib=a.ib;
+    hybrid= a.hybrid;
+    herbivore= a.herbivore;
+    repcounter= a.repcounter;
+    dfood = a.dfood;
+    id=a.id;
+
+    MUTRATE1= a.MUTRATE1;
+    MUTRATE2= a.MUTRATE2;
+
+    in = a.in;
+    out = a.out;
+    brain = a.brain;
+    mutations = a.mutations;
+}
+
+
 void Agent::printSelf()
 {
     printf("Agent age=%i\n", age);

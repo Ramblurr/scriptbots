@@ -5,9 +5,9 @@
 #include <QtCore/QDebug>
 #include <QtCore/QTimer>
 
-SimulationController::SimulationController() : QObject( 0 ), mWorld(0), mModcounter(0), mSkipdraw(2)
+SimulationController::SimulationController() : QObject( 0 ), mWorld(0), mModcounter(0), mFrames(0), mSkipdraw(2), mDraw(true)
 {
-    
+    mTime.start();
 }
 
 SimulationController::~SimulationController()
@@ -17,26 +17,24 @@ SimulationController::~SimulationController()
 
 void SimulationController::doTick()
 {
+//     while(1) {
     if( !mWorld->isPaused()  ) {
         mWorld->update();
         ++mModcounter;
-        if( mModcounter % mSkipdraw  == 0 ) {
+        ++mFrames;
+        if( mDraw && mModcounter % mSkipdraw  == 0 ) {
             emit gameState( mWorld->getAgents() );
         }
+        int msec = mTime.elapsed();
+        if( msec >= 1000 ) {
+//             emit fps(mFrames);
+            qDebug() << "fps:" << mFrames;
+            mFrames = 0;
+            mTime.restart();
+        }
         QMetaObject::invokeMethod(this, "doTick", Qt::QueuedConnection);
-    }
+    } 
 }
-
-void SimulationController::doDraw()
-{
-    if( !mWorld->isPaused()  ) {
-//         if( mModcounter % mSkipdraw  == 0 ) {
-            emit gameState( mWorld->getAgents() );
-//         }
-    }
-    QTimer::singleShot(500, this, SLOT(doDraw()) );
-}
-
 
 void SimulationController::startSimulation()
 {
@@ -44,6 +42,7 @@ void SimulationController::startSimulation()
         qDebug() << "created new world";
         mWorld = new World();
     }
+    mTime.restart();
     qDebug() << "unpaused";
     mWorld->setPaused(false);
 //     QTimer::singleShot(50, this, SLOT(doDraw()) );
@@ -65,14 +64,8 @@ void SimulationController::resetSimulation()
     
 }
 
-void SimulationController::drawAgent(const Agent& a)
+void SimulationController::toggleDrawing()
 {
-//     qDebug() << "draw agent at" << a.pos.x << a.pos.y;
-//     Agent a1(a);
-    doDrawAgent(a);
+    mDraw = !mDraw;
 }
 
-void SimulationController::drawFood(int x, int y, float quantity)
-{
-    emit doDrawFood(x,y,quantity);
-}

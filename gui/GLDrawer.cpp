@@ -6,6 +6,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QCoreApplication>
+
 void drawCircle2(float x, float y, float r) {
     float n;
     for (int k=0;k<17;k++) {
@@ -14,7 +15,7 @@ void drawCircle2(float x, float y, float r) {
     }
 }
 
-GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent), drawfood(true)
+GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent), drawfood(true), modcounter(0), skipdraw(1)
 {
     mUpdateTimer.setInterval(0);
     connect(&mUpdateTimer, SIGNAL(timeout()), SLOT(updateGL()));
@@ -51,20 +52,20 @@ void GLDrawer::resizeGL(int w, int h)
 
 void GLDrawer::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
+    ++modcounter;
+    if (modcounter%skipdraw==0) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
 
-    if(!mStateQueue.isEmpty())  {
-//         qDebug() << "drwaing";
-        std::vector<Agent> agents = mStateQueue.dequeue();
-        int len = agents.size();
-        for(int i=0; i< len; ++i) {
-            drawAgent( agents[i] );
+        if(!mStateQueue.isEmpty())  {
+            std::vector<Agent> agents = mStateQueue.dequeue();
+            int len = agents.size();
+            for(int i=0; i< len; ++i) {
+                drawAgent( agents[i] );
+            }
         }
-//         QCoreApplication::processEvents();
+        glPopMatrix();
     }
-    
-    glPopMatrix();
 }
 
 void GLDrawer::drawAgent(const Agent& agent)
@@ -262,20 +263,20 @@ void GLDrawer::drawFood(int x, int y, float quantity)
     }
 }
 
-void GLDrawer::storeAgent(const Agent& a)
-{
-//     mAgentQueue.enqueue(a);
-}
-
-void GLDrawer::storeFood(int x, int y, float quantity)
-{
-//     mFoodQueue.enqueue(Food(x,y,quantity));
-}
-
 void GLDrawer::storeState(const std::vector< Agent >& agents)
 {
     mStateQueue.enqueue( agents );
     qDebug() << agents.size();
 }
 
+void GLDrawer::decrementSkip()
+{
+    skipdraw -= 10;
+    qDebug() << skipdraw;
+}
 
+void GLDrawer::incrementSkip()
+{
+    skipdraw += 10;
+    qDebug() << skipdraw;
+}

@@ -6,37 +6,36 @@
 #include "registertypes.h"
 
 #include <QtCore/QObject>
+#include <QtCore/QTime>
 
-
-class SimulationController : public  QObject, public View
+class SimulationController : public  QObject
 {
 Q_OBJECT
 public:
     SimulationController();
     virtual ~SimulationController();
     
-    virtual void drawAgent(const Agent& a);
-    virtual void drawFood(int x, int y, float quantity);
-
 signals:
-    void doDrawAgent(const Agent & a);
     void gameState(const std::vector<Agent> &agents);
-    void doDrawFood(int x, int y, float quantity);
+    void fps(int fps);
 
 public slots:
     void startSimulation();
     void pauseSimulation();
     void resetSimulation();
+    void toggleDrawing();
 
 private slots:
-    void doDraw();
     void doTick();
     
 private:
     
+    bool mDraw;
     World *mWorld;
     int mModcounter;
+    int mFrames;
     int mSkipdraw;
+    QTime mTime;
 };
 
 #endif // SIMULATIONCONTROLLER_H
