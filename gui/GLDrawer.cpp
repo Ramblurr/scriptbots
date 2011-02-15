@@ -39,6 +39,7 @@ void GLDrawer::initializeGL()
     glLoadIdentity();
     glClearColor(0.9f, 0.9f, 1.0f, 0.0f);
     glOrtho(0,conf::WWIDTH,conf::WHEIGHT,0,0,1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 }
 
 void GLDrawer::resizeGL(int w, int h)
@@ -54,17 +55,30 @@ void GLDrawer::paintGL()
 {
     ++modcounter;
     if (modcounter%skipdraw==0) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glPushMatrix();
-
         if(!mStateQueue.isEmpty())  {
-            std::vector<Agent> agents = mStateQueue.dequeue();
-            int len = agents.size();
-            for(int i=0; i< len; ++i) {
-                drawAgent( agents[i] );
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+            SimState* s = mStateQueue.dequeue();
+            
+            int w = s->food.size();
+            if(w > 0 && drawfood) {
+                int h = s->food[0].size();
+                for (int x=0;x<w;x++) {
+                    for (int y=0;y<h;y++) {
+                        Food *f = s->food[x][y];
+                        drawFood(f->x, f->y, f->quantity);
+                        delete f;
+                    }
+                }
             }
+            
+            int len = s->agents.size();
+            for(int i=0; i< len; ++i) {
+                drawAgent( s->agents[i] );
+            }
+            delete s;
+            glPopMatrix();
         }
-        glPopMatrix();
     }
 }
 
@@ -252,21 +266,19 @@ void GLDrawer::drawAgent(const Agent& agent)
 void GLDrawer::drawFood(int x, int y, float quantity)
 {
     //draw food
-    if (drawfood) {
-        glBegin(GL_QUADS);
-        glColor3f(0.9-quantity,0.9-quantity,1.0-quantity);
-        glVertex3f(x*conf::CZ,y*conf::CZ,0);
-        glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ,0);
-        glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ+conf::CZ,0);
-        glVertex3f(x*conf::CZ,y*conf::CZ+conf::CZ,0);
-        glEnd();
-    }
+    glBegin(GL_QUADS);
+    glColor3f(0.9-quantity,0.9-quantity,1.0-quantity);
+    glVertex3f(x*conf::CZ,y*conf::CZ,0);
+    glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ,0);
+    glVertex3f(x*conf::CZ+conf::CZ,y*conf::CZ+conf::CZ,0);
+    glVertex3f(x*conf::CZ,y*conf::CZ+conf::CZ,0);
+    glEnd();
 }
 
-void GLDrawer::storeState(const std::vector< Agent >& agents)
+void GLDrawer::storeState(SimState* state)
 {
-    mStateQueue.enqueue( agents );
-    qDebug() << agents.size();
+    mStateQueue.enqueue( state );
+    qDebug() << "backlog: " << mStateQueue.size();
 }
 
 void GLDrawer::decrementSkip()

@@ -46,8 +46,8 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( this,        SIGNAL( toggleDrawing() ), 
               mController, SLOT(   toggleDrawing() ), Qt::QueuedConnection );
     
-    connect( mController, SIGNAL( gameState(std::vector<Agent>) ), 
-              mGLWidget,   SLOT(   storeState(std::vector<Agent> ) ), Qt::QueuedConnection );
+    connect( mController, SIGNAL( simState(SimState*) ), 
+              mGLWidget,   SLOT(   storeState(SimState*) ), Qt::QueuedConnection );
     
     connect( mController, SIGNAL( fps(int) ), 
               this,   SLOT( slotFpsUpdate(int) ), Qt::QueuedConnection );

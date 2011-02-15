@@ -16,7 +16,7 @@ public:
     virtual ~SimulationController();
     
 signals:
-    void gameState(const std::vector<Agent> &agents);
+    void simState(SimState *state);
     void fps(int fps);
 
 public slots:

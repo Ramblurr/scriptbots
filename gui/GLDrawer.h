@@ -8,23 +8,6 @@
 #include <QtCore/QQueue>
 #include <QtCore/QTimer>
 
-struct Food {
-    Food(){}
-    Food(int ax, int ay, int q) 
-    { 
-        x = ax;
-        y = ay;
-        quantity = q;
-    }
-    Food( const Food & o) {
-        x = o.x;
-        y = o.y;
-        quantity = o.quantity;
-    }
-    int x;
-    int y;
-    float quantity;
-};
 
 Q_DECLARE_METATYPE(Food);
 
@@ -40,7 +23,7 @@ public:
     void drawFood(int x, int y, float quantity);
     
 public slots:
-    void storeState(const std::vector<Agent> &agents);
+    void storeState(SimState *state);
     void incrementSkip();
     void decrementSkip();
     
@@ -61,7 +44,7 @@ private:
     int lastUpdate;
     int frames;
     
-    QQueue<std::vector< Agent > > mStateQueue;
+    QQueue<SimState*> mStateQueue;
     QTimer mUpdateTimer;
 };
 

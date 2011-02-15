@@ -7,6 +7,33 @@
 #include <vector>
 #include <string>
 
+class Agent;
+
+struct Food {
+    Food(){}
+    Food(int ax, int ay, float q) 
+    { 
+        x = ax;
+        y = ay;
+        quantity = q;
+    }
+    Food( const Food & o) {
+        x = o.x;
+        y = o.y;
+        quantity = o.quantity;
+    }
+    int x;
+    int y;
+    float quantity;
+};
+
+typedef std::vector<std::vector<Food*> > FoodBlock;
+
+struct SimState {
+    std::vector<Agent> agents;
+    FoodBlock food;
+};
+
 class Agent
 {
 

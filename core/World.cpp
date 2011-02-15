@@ -588,7 +588,22 @@ int World::epoch() const
     return current_epoch;
 }
 
-vector< Agent > World::getAgents()
+std::vector<Agent> World::getAgents() const
 {
     return agents;
 }
+
+FoodBlock World::getFood() const
+{
+    FoodBlock foods(FW);
+    for(int i=0;i<FW;i++) {
+        std::vector<Food*> col(FH);
+        foods[i] = col;
+        for(int j=0;j<FH;j++) {
+            float q= 0.5*food[i][j]/conf::FOODMAX;
+            foods[i][j] = new Food(i,j,q);
+        }
+    }
+    return foods;
+}
+

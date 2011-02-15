@@ -23,7 +23,10 @@ void SimulationController::doTick()
         ++mModcounter;
         ++mFrames;
         if( mDraw && mModcounter % mSkipdraw  == 0 ) {
-            emit gameState( mWorld->getAgents() );
+            SimState* s = new SimState;
+            s->agents = mWorld->getAgents();
+            s->food = mWorld->getFood();
+            emit simState( s );
         }
         int msec = mTime.elapsed();
         if( msec >= 1000 ) {
