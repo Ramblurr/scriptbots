@@ -29,7 +29,7 @@ private slots:
     void timeout();
     void slotStart();
     void slotPause();
-    void slotRestart();
+    void slotReset();
     
 private:
     void setupToolbar();

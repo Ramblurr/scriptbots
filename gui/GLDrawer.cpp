@@ -4,8 +4,8 @@
 
 #include "settings.h"
 
-#include <QDebug>
-
+#include <QtCore/QDebug>
+#include <QtCore/QCoreApplication>
 void drawCircle2(float x, float y, float r) {
     float n;
     for (int k=0;k<17;k++) {
@@ -14,9 +14,11 @@ void drawCircle2(float x, float y, float r) {
     }
 }
 
-GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent)
+GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent), drawfood(true)
 {
-
+    mUpdateTimer.setInterval(0);
+    connect(&mUpdateTimer, SIGNAL(timeout()), SLOT(updateGL()));
+    mUpdateTimer.start();
 }
 
 QSize GLDrawer::minimumSizeHint() const
@@ -52,12 +54,18 @@ void GLDrawer::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
-    world->draw(this, drawfood);
-
+    if(!mStateQueue.isEmpty())  {
+//         qDebug() << "drwaing";
+        std::vector<Agent> agents = mStateQueue.dequeue();
+        int len = agents.size();
+        for(int i=0; i< len; ++i) {
+            drawAgent( agents[i] );
+        }
+//         QCoreApplication::processEvents();
+    }
+    
     glPopMatrix();
-//     glutSwapBuffers();
 }
-
 
 void GLDrawer::drawAgent(const Agent& agent)
 {
@@ -254,7 +262,20 @@ void GLDrawer::drawFood(int x, int y, float quantity)
     }
 }
 
-void GLDrawer::setWorld(World* w)
+void GLDrawer::storeAgent(const Agent& a)
 {
-    world = w;
+//     mAgentQueue.enqueue(a);
 }
+
+void GLDrawer::storeFood(int x, int y, float quantity)
+{
+//     mFoodQueue.enqueue(Food(x,y,quantity));
+}
+
+void GLDrawer::storeState(const std::vector< Agent >& agents)
+{
+    mStateQueue.enqueue( agents );
+    qDebug() << agents.size();
+}
+
+

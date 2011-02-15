@@ -2,6 +2,8 @@
 
 #include "GLDrawer.h"
 #include "SimulationController.h"
+#include "Agent.h"
+#include "registertypes.h"
 
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>
@@ -10,8 +12,11 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 
-void doQt(int argc, char **argv) {
-    
+void doQt(int argc, char **argv) 
+{
+    qRegisterMetaType<Agent>();
+    qRegisterMetaType<Food>();
+    qRegisterMetaType<std::vector<Agent> >();
     QApplication app( argc, argv );
     MainWindow foo;
     foo.show();
@@ -20,26 +25,35 @@ void doQt(int argc, char **argv) {
 
 MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
 {
-//     mGLWidget = new GLDrawer(this);
+    mGLWidget = new GLDrawer(this);
+    setCentralWidget(mGLWidget);
 
     mToolBar = new QToolBar(this);
+    addToolBar(mToolBar);
     setupToolbar();
     
     mController = new SimulationController;
     
     connect( this,        SIGNAL( startSimulation() ), 
-              mController, SLOT(   startSimulation() ) );
+              mController, SLOT(   startSimulation() ), Qt::QueuedConnection );
     
     connect( this,        SIGNAL( pauseSimulation()), 
-              mController, SLOT(   pauseSimulation() ) );
+              mController, SLOT(   pauseSimulation() ), Qt::QueuedConnection );
     
     connect( this,        SIGNAL( resetSimulation() ), 
-              mController, SLOT(   resetSimulation() ) );
+              mController, SLOT(   resetSimulation() ), Qt::QueuedConnection );
+
+    connect( mController, SIGNAL( gameState(std::vector<Agent>) ), 
+              mGLWidget,   SLOT(   storeState(std::vector<Agent> ) ), Qt::QueuedConnection );
+    
+    /*connect( mController, SIGNAL( doDrawAgent( Agent ) ),
+              mGLWidget,   SLOT(   storeAgent ( Agent ) ), Qt::QueuedConnection );
+
+    connect( mController, SIGNAL( doDrawFood(int,int,float) ),
+              mGLWidget,   SLOT(   storeFood(int,int,float) ) );*/
     
     mController->moveToThread(&mThread);
     mThread.start();
-    
-//     setCentralWidget(mGLWidget);
     
 //     QTimer* t = new QTimer( this );
 //     t->start( 50 );
@@ -78,7 +92,7 @@ void MainWindow::setupToolbar()
 
 void MainWindow::timeout()
 {
-//     mGLWidget->updateGL();
+    qDebug() << "draw agent at";
 }
 
 void MainWindow::slotStart()

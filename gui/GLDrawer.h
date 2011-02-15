@@ -1,32 +1,56 @@
 #ifndef GLDRAWER_H
 #define GLDRAWER_H
 
-#include <QtOpenGL/qgl.h>
-
 #include "World.h"
-#include "View.h"
+#include "registertypes.h"
 
+#include <QtOpenGL/QGLWidget>
+#include <QtCore/QQueue>
+#include <QtCore/QTimer>
 
-class GLDrawer : public QGLWidget, public View
+struct Food {
+    Food(){}
+    Food(int ax, int ay, int q) 
+    { 
+        x = ax;
+        y = ay;
+        quantity = q;
+    }
+    Food( const Food & o) {
+        x = o.x;
+        y = o.y;
+        quantity = o.quantity;
+    }
+    int x;
+    int y;
+    float quantity;
+};
+
+Q_DECLARE_METATYPE(Food);
+
+class GLDrawer : public QGLWidget
 {
+Q_OBJECT
 public:
     GLDrawer(QWidget *parent);
 
     virtual QSize minimumSizeHint() const;
     virtual QSize sizeHint() const;
+    void drawAgent(const Agent &a);
+    void drawFood(int x, int y, float quantity);
     
-    virtual void drawAgent(const Agent &a);
-    virtual void drawFood(int x, int y, float quantity);
-    
-    void setWorld(World* w);
+public slots:
+    void storeState(const std::vector<Agent> &agents);
+    void storeAgent(const Agent &a);
+    void storeFood(int x, int y, float quantity);
     
 protected:
     virtual void initializeGL();
     virtual void resizeGL(int w, int h);
     virtual void paintGL();
+
 private:
 
-    World *world;
     bool paused;
     bool draw;
     int skipdraw;
@@ -36,6 +60,9 @@ private:
     int modcounter;
     int lastUpdate;
     int frames;
+    
+    QQueue<std::vector< Agent > > mStateQueue;
+    QTimer mUpdateTimer;
 };
 
 #endif // GLDRAWER_H
