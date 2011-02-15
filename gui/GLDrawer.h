@@ -21,9 +21,12 @@ public:
     virtual QSize sizeHint() const;
     void drawAgent(const Agent &a);
     void drawFood(int x, int y, float quantity);
-    
+
+signals:
+    void finished(SimState *state);
+
 public slots:
-    void storeState(SimState *state);
+    void storeStates(QQueue<SimState*> states);
     void incrementSkip();
     void decrementSkip();
     

@@ -54,22 +54,21 @@ void GLDrawer::resizeGL(int w, int h)
 void GLDrawer::paintGL()
 {
     ++modcounter;
-    if(!mStateQueue.isEmpty())  {
+    if(!mStateQueue.isEmpty()) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glPushMatrix();
         SimState* s = mStateQueue.dequeue();
 
         int len = s->food.size();
         for(int i=0; i < len ; ++i) {
-            Food f = s->food[i];
-            drawFood(f.x, f.y, f.quantity);
+            drawFood(s->food[i].x, s->food[i].y, s->food[i].quantity);
         }
 
         len = s->agents.size();
         for(int i=0; i< len; ++i) {
             drawAgent( s->agents[i] );
         }
-        delete s;
+        emit finished(s);
         glPopMatrix();
     }
 }
@@ -267,22 +266,21 @@ void GLDrawer::drawFood(int x, int y, float quantity)
     glEnd();
 }
 
-void GLDrawer::storeState(SimState* state)
+void GLDrawer::storeStates(QQueue< SimState* > states)
 {
-    if (modcounter%skipdraw==0) {
-        mStateQueue.enqueue( state );
-        qDebug() << "backlog: " << mStateQueue.size();
-    }
+    mStateQueue.append(states);
+    qDebug() << "backlog: " << mStateQueue.size();
 }
+
 
 void GLDrawer::decrementSkip()
 {
-    skipdraw -= 10;
+    skipdraw -= 1;
     qDebug() << "skipdraw:" << skipdraw;
 }
 
 void GLDrawer::incrementSkip()
 {
-    skipdraw += 10;
+    skipdraw += 1;
     qDebug() << "skipdraw:" << skipdraw;
 }

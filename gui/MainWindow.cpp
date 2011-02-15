@@ -11,12 +11,15 @@
 #include <QtGui/QToolBar>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
+#include <QtCore/QQueue>
 
 void doQt(int argc, char **argv) 
 {
     qRegisterMetaType<Agent>();
     qRegisterMetaType<Food>();
     qRegisterMetaType<std::vector<Agent> >();
+    qRegisterMetaType<QQueue<SimState*> >("QQueue<SimState*>");
+//     qRegisterMetaType<QQueue<Agent> >();
     QApplication app( argc, argv );
     MainWindow foo;
     foo.show();
@@ -46,11 +49,14 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( this,        SIGNAL( toggleDrawing() ), 
               mController, SLOT(   toggleDrawing() ), Qt::QueuedConnection );
     
-    connect( mController, SIGNAL( simState(SimState*) ), 
-              mGLWidget,   SLOT(   storeState(SimState*) ), Qt::QueuedConnection );
+    connect( mController, SIGNAL( simStateBatch( QQueue<SimState*> ) ),
+              mGLWidget,   SLOT(   storeStates( QQueue<SimState*> ) ), Qt::QueuedConnection );
     
     connect( mController, SIGNAL( fps(int) ), 
               this,   SLOT( slotFpsUpdate(int) ), Qt::QueuedConnection );
+    
+    connect( mGLWidget, SIGNAL(   finished( SimState* ) ),
+              mController,   SLOT( reapState(SimState* ) ), Qt::QueuedConnection );
     
     mController->moveToThread(&mThread);
     mThread.start(QThread::HighestPriority);
