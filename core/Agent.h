@@ -36,10 +36,17 @@ class Agent
 {
 
 public:
+    /**
+     * Creates an Agent with all values set to 0
+     * */
     Agent();
     ~Agent();
     Agent(const Agent &other );
     
+    /**
+     * Randomizes all the Agent's attributes
+     * */
+    void randomize();
     
     void printSelf();
      //for drawing purposes
@@ -65,8 +72,8 @@ public:
     float spikeLength;
     int age;
 
-    std::vector<float> in; //input: 2 eyes, sensors for R,G,B,proximity each, then Sound, Smell, Health
-    std::vector<float> out; //output: Left, Right, R, G, B, SPIKE
+    float in[INPUTSIZE]; //input: 2 eyes, sensors for R,G,B,proximity each, then Sound, Smell, Health
+    float out[OUTPUTSIZE]; //output: Left, Right, R, G, B, SPIKE
 
     float repcounter; //when repcounter gets to 0, this bot reproduces
     int gencount; //generation counter
@@ -92,7 +99,7 @@ public:
     
     //will store the mutations that this agent has from its parent
     //can be used to tune the mutation rate
-    std::vector<std::string> mutations;
+//     std::vector<std::string> mutations;
 };
 
 #endif // AGENT_H

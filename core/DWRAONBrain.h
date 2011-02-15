@@ -4,7 +4,7 @@
 #include "settings.h"
 #include "helpers.h"
 
-#include <vector>
+#include <tr1/array>
 
 #define INPUTSIZE 20
 #define OUTPUTSIZE 9
@@ -21,15 +21,9 @@ public:
     //props
     int type; //0: AND, 1:OR
     float kp; //kp: damping strength
-    std::vector<float> w; //weight of each connecting box (in [0,inf]
-    std::vector<int> id; //id in boxes[] of the connecting box
-	/* changed from <bool> to <char> because vector<bool> doesn't 
-	   have true random access, and thus slows the simulation to a crawl.
-	   http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=98
-	   It still stores boolean values at the cost of space overhead,
-	   but with a significant speed improvement.
-	*/
-	std::vector<char> notted; //is this input notted before coming in?
+    std::tr1::array<float, CONNS> w; //weight of each connecting box (in [0,inf]
+    std::tr1::array<int, CONNS> id; //id in boxes[] of the connecting box
+    std::tr1::array<bool, CONNS> notted; //is this input notted before coming in?
     float bias;
 
     //state variables
@@ -45,13 +39,13 @@ class DWRAONBrain
 {
 public:
 
-    std::vector<Box> boxes;
+    std::tr1::array<Box,BRAINSIZE> boxes;
 
     DWRAONBrain();
     DWRAONBrain(const DWRAONBrain &other);
     virtual DWRAONBrain& operator=(const DWRAONBrain& other);
 
-    void tick(std::vector<float>& in, std::vector<float>& out);
+    void tick(float in[], float out[]);
     void mutate(float MR, float MR2);
     DWRAONBrain crossover( const DWRAONBrain &other );
 private:

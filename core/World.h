@@ -19,8 +19,8 @@ public:
     
     void draw(View* view, bool drawfood);
     
-    std::vector<Agent> getAgents() const;
-    std::vector<Food> getFood() const;
+    void getAgents(std::vector<Agent> &a) const;
+    void getFood(std::vector<Food> &f) const;
     
     bool isClosed() const;
     void setClosed(bool close);

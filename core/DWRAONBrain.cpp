@@ -4,11 +4,6 @@ using namespace std;
 
 Box::Box()
 {
-
-    w.resize(CONNS,0);
-    id.resize(CONNS,0);
-    notted.resize(CONNS,0);
-
     //constructor
     for (int i=0;i<CONNS;i++) {
         w[i]= randf(0.1,2);
@@ -31,7 +26,7 @@ DWRAONBrain::DWRAONBrain()
     //constructor
     for (int i=0;i<BRAINSIZE;i++) {
         Box a; //make a random box and copy it over
-        boxes.push_back(a);
+        boxes[i] = a;
 
         boxes[i].out= a.out;
         boxes[i].target= a.target;
@@ -76,7 +71,7 @@ void DWRAONBrain::init()
 
 }
 
-void DWRAONBrain::tick(vector< float >& in, vector< float >& out)
+void DWRAONBrain::tick(float in[], float out[])
 {
 
     //do a single tick of the brain
@@ -185,12 +180,12 @@ DWRAONBrain DWRAONBrain::crossover(const DWRAONBrain& other)
     //instead of returning by value
     DWRAONBrain newbrain(*this);
     
-    for (int i=0;i<newbrain.boxes.size(); i++) {
+    for (int i=0;i< BRAINSIZE ; i++) {
         newbrain.boxes[i].bias= randf(0,1)<0.5 ? this->boxes[i].bias : other.boxes[i].bias;
         newbrain.boxes[i].kp= randf(0,1)<0.5 ? this->boxes[i].kp : other.boxes[i].kp;
         newbrain.boxes[i].type= randf(0,1)<0.5 ? this->boxes[i].type : other.boxes[i].type;
 
-        for (int j=0;j<newbrain.boxes[i].id.size();j++) {
+        for (int j=0;j< CONNS;j++) {
             newbrain.boxes[i].id[j] = randf(0,1)<0.5 ? this->boxes[i].id[j] : other.boxes[i].id[j];
             newbrain.boxes[i].notted[j] = randf(0,1)<0.5 ? this->boxes[i].notted[j] : other.boxes[i].notted[j];
             newbrain.boxes[i].w[j] = randf(0,1)<0.5 ? this->boxes[i].w[j] : other.boxes[i].w[j];

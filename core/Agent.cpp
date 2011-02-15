@@ -9,38 +9,6 @@
 using namespace std;
 Agent::Agent()
 {
-    pos= Vector2f(randf(0,conf::WIDTH),randf(0,conf::HEIGHT));
-    angle= randf(-M_PI,M_PI);
-    health= 1.0+randf(0,0.1);
-    age=0;
-    spikeLength=0;
-    red= 0;
-    gre= 0;
-    blu= 0;
-    w1=0;
-    w2=0;
-    soundmul=1;
-    give=0;
-    clockf1= randf(5,100);
-    clockf2= randf(5,100);
-    boost=false;
-    indicator=0;
-    gencount=0;
-    selectflag=0;
-    ir=0;
-    ig=0;
-    ib=0;
-    hybrid= false;
-    herbivore= randf(0,1);
-    repcounter= herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
-
-    id=0;
-
-    MUTRATE1= 0.003;
-    MUTRATE2= 0.05;
-
-    in.resize(INPUTSIZE, 0);
-    out.resize(OUTPUTSIZE, 0);
 }
 
 Agent::~Agent()
@@ -80,19 +48,55 @@ Agent::Agent(const Agent& a)
     MUTRATE1= a.MUTRATE1;
     MUTRATE2= a.MUTRATE2;
 
-    in = a.in;
-    out = a.out;
+    for(int i=0; i < INPUTSIZE; ++i)
+        in[i] = a.in[i];
+    for(int i=0; i < OUTPUTSIZE; ++i)
+        out[i] = a.out[i];
     brain = a.brain;
-    mutations = a.mutations;
+//     mutations = a.mutations;
 }
+
+void Agent::randomize()
+{
+    pos= Vector2f(randf(0,conf::WIDTH),randf(0,conf::HEIGHT));
+    angle= randf(-M_PI,M_PI);
+    health= 1.0+randf(0,0.1);
+    age=0;
+    spikeLength=0;
+    red= 0;
+    gre= 0;
+    blu= 0;
+    w1=0;
+    w2=0;
+    soundmul=1;
+    give=0;
+    clockf1= randf(5,100);
+    clockf2= randf(5,100);
+    boost=false;
+    indicator=0;
+    gencount=0;
+    selectflag=0;
+    ir=0;
+    ig=0;
+    ib=0;
+    hybrid= false;
+    herbivore= randf(0,1);
+    repcounter= herbivore*randf(conf::REPRATEH-0.1,conf::REPRATEH+0.1) + (1-herbivore)*randf(conf::REPRATEC-0.1,conf::REPRATEC+0.1);
+
+    id=0;
+
+    MUTRATE1= 0.003;
+    MUTRATE2= 0.05;
+}
+
 
 
 void Agent::printSelf()
 {
-    printf("Agent age=%i\n", age);
-    for (int i=0;i<mutations.size();i++) {
-        cout << mutations[i];
-    }
+//     printf("Agent age=%i\n", age);
+//     for (int i=0;i<mutations.size();i++) {
+//         cout << mutations[i];
+//     }
 }
 
 void Agent::initEvent(float size, float r, float g, float b)
@@ -110,6 +114,7 @@ void Agent::tick()
 Agent Agent::reproduce(float MR, float MR2)
 {
     Agent a2;
+    a2.randomize();
 
     //spawn the baby somewhere closeby behind agent
     //we want to spawn behind so that agents dont accidentally eat their young right away
@@ -150,6 +155,7 @@ Agent Agent::crossover(const Agent& other)
     //this could be made faster by returning a pointer
     //instead of returning by value
     Agent anew;
+    anew.randomize();
     anew.hybrid=true; //set this non-default flag
     anew.gencount= this->gencount;
     if (other.gencount<anew.gencount) anew.gencount= other.gencount;

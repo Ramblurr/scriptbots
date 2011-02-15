@@ -454,6 +454,7 @@ void World::addRandomBots(int num)
 {
     for (int i=0;i<num;i++) {
         Agent a;
+        a.randomize();
         a.id= idcounter;
         idcounter++;
         agents.push_back(a);
@@ -588,20 +589,20 @@ int World::epoch() const
     return current_epoch;
 }
 
-std::vector<Agent> World::getAgents() const
+void World::getAgents(std::vector<Agent> &a) const
 {
-    return agents;
+    a = agents;
 }
 
-std::vector<Food> World::getFood() const
+void World::getFood(std::vector<Food> &f) const
 {
-    std::vector<Food> foods(FW*FH);
+    std::vector<Food> f_tmp(FW*FH);
     for(int i=0;i<FW;i++) {
         for(int j=0;j<FH;j++) {
             float q= 0.5*food[i][j]/conf::FOODMAX;
-            foods.push_back( Food(i,j,q) );
+            f_tmp.push_back(Food(i,j,q) );
         }
     }
-    return foods;
+    f.swap(f_tmp);
 }
 
