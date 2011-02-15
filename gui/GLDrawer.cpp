@@ -278,11 +278,11 @@ void GLDrawer::storeState(SimState* state)
 void GLDrawer::decrementSkip()
 {
     skipdraw -= 10;
-    qDebug() << skipdraw;
+    qDebug() << "skipdraw:" << skipdraw;
 }
 
 void GLDrawer::incrementSkip()
 {
     skipdraw += 10;
-    qDebug() << skipdraw;
+    qDebug() << "skipdraw:" << skipdraw;
 }
