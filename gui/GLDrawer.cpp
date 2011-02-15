@@ -60,19 +60,13 @@ void GLDrawer::paintGL()
             glPushMatrix();
             SimState* s = mStateQueue.dequeue();
             
-            int w = s->food.size();
-            if(w > 0 && drawfood) {
-                int h = s->food[0].size();
-                for (int x=0;x<w;x++) {
-                    for (int y=0;y<h;y++) {
-                        Food *f = s->food[x][y];
-                        drawFood(f->x, f->y, f->quantity);
-                        delete f;
-                    }
-                }
+            int len = s->food.size();
+            for(int i=0; i < len ; ++i) {
+                Food f = s->food[i];
+                drawFood(f.x, f.y, f.quantity);
             }
             
-            int len = s->agents.size();
+            len = s->agents.size();
             for(int i=0; i< len; ++i) {
                 drawAgent( s->agents[i] );
             }

@@ -27,11 +27,9 @@ struct Food {
     float quantity;
 };
 
-typedef std::vector<std::vector<Food*> > FoodBlock;
-
 struct SimState {
     std::vector<Agent> agents;
-    FoodBlock food;
+    std::vector<Food> food;
 };
 
 class Agent

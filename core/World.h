@@ -20,7 +20,7 @@ public:
     void draw(View* view, bool drawfood);
     
     std::vector<Agent> getAgents() const;
-    FoodBlock getFood() const;
+    std::vector<Food> getFood() const;
     
     bool isClosed() const;
     void setClosed(bool close);
