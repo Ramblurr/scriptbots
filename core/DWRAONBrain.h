@@ -4,7 +4,11 @@
 #include "settings.h"
 #include "helpers.h"
 
+#ifdef __GNUC__
+#include <tr1/array>
+#else
 #include <array>
+#endif
 
 #define INPUTSIZE 20
 #define OUTPUTSIZE 9
