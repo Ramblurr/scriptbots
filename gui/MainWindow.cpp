@@ -52,7 +52,7 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( mController, SIGNAL( simStateBatch( QQueue<SimState*> ) ),
               mGLWidget,   SLOT(   storeStates( QQueue<SimState*> ) ), Qt::QueuedConnection );
     
-    connect( mController, SIGNAL( fps(int) ), 
+    connect( mController, SIGNAL( ticksPerSecond(int) ), 
               this,   SLOT( slotFpsUpdate(int) ), Qt::QueuedConnection );
     
     connect( mGLWidget, SIGNAL(   finished( SimState* ) ),
@@ -138,7 +138,6 @@ void MainWindow::slotToggleDrawing()
 
 void MainWindow::slotFpsUpdate(int fps)
 {
-//     qDebug() << "fps:" << fps;
     QString title = "FPS: " + QString::number(fps);
     setWindowTitle(title);
 }

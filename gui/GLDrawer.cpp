@@ -269,7 +269,7 @@ void GLDrawer::drawFood(int x, int y, float quantity)
 void GLDrawer::storeStates(QQueue< SimState* > states)
 {
     mStateQueue.append(states);
-    qDebug() << "backlog: " << mStateQueue.size();
+//     qDebug() << "backlog: " << mStateQueue.size();
 }
 
 

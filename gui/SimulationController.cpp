@@ -12,7 +12,7 @@ SimulationController::SimulationController() : QObject( 0 ), mInitialized(false)
 
 SimulationController::~SimulationController()
 {
-
+    //TODO memory cleanup?
 }
 
 void SimulationController::doTick()
@@ -23,15 +23,9 @@ void SimulationController::doTick()
         ++mModcounter;
         ++mFrames;
         if( mDraw /*&& mModcounter % mSkipdraw  == 0*/) {
-            SimState *s  = 0;
-            if( mStack.isEmpty() ) {
-//                 qDebug() << "SimStack stack is empty..";
-                if( mStack.size() < 10000 )
-                    s = new SimState;
-            } else {
+            if( !mStack.isEmpty() ) {
+                SimState *s  = 0;
                 s = mStack.pop();
-            }
-            if(s) {
                 mWorld->getAgents(s->agents );
         //             mWorld->getFood(s->food);
                 mStateBatch.enqueue(s);
@@ -39,8 +33,8 @@ void SimulationController::doTick()
         }
         int msec = mTime.elapsed();
         if( msec >= 1000 ) {
-//             emit fps(mFrames);
-            qDebug() << "fps:" << mFrames;
+            emit ticksPerSecond(mFrames);
+//             qDebug() << "fps:" << mFrames;
             mFrames = 0;
             mTime.restart();
         }
@@ -90,12 +84,16 @@ void SimulationController::startSimulation()
 
 void SimulationController::pauseSimulation()
 {
+    if(!mInitialized)
+        return;
     qDebug() << "pause";
     mWorld->setPaused(true);
 }
 
 void SimulationController::resetSimulation()
 {
+    if(!mInitialized)
+        return;
     mWorld->reset();
     mWorld->setPaused(true);
     mModcounter = 0;
