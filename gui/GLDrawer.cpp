@@ -5,6 +5,8 @@
 #include "settings.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
 #include <QtCore/QCoreApplication>
 
 void drawCircle2(float x, float y, float r) {
@@ -15,11 +17,12 @@ void drawCircle2(float x, float y, float r) {
     }
 }
 
-GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent), drawfood(true), modcounter(0), skipdraw(1)
+GLDrawer::GLDrawer(QWidget* parent): QGLWidget(parent), drawfood(true), modcounter(0), skipdraw(1), frames(0), draw(true)
 {
-    mUpdateTimer.setInterval(0);
-    connect(&mUpdateTimer, SIGNAL(timeout()), SLOT(updateGL()));
-    mUpdateTimer.start();
+//     mUpdateTimer.setInterval(33);
+//     connect(&mUpdateTimer, SIGNAL(timeout()), SLOT(updateGL()));
+    QTimer::singleShot(20, this, SLOT(updateGL()));
+    mTime.start();
 }
 
 QSize GLDrawer::minimumSizeHint() const
@@ -53,7 +56,12 @@ void GLDrawer::resizeGL(int w, int h)
 
 void GLDrawer::paintGL()
 {
+    if( !draw )
+        return;
+    QTime now;
+    now.start();
     ++modcounter;
+    ++frames;
     if(!mStateQueue.isEmpty()) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glPushMatrix();
@@ -71,6 +79,13 @@ void GLDrawer::paintGL()
         emit finished(s);
         glPopMatrix();
     }
+    int msec = mTime.elapsed();
+    if( msec >= 1000 ) {
+        qDebug() << "FPS: " << frames;
+        mTime.restart();
+        frames = 0;
+    }
+    QTimer::singleShot(qMax(0,100-now.elapsed()), this, SLOT(updateGL())); //should get around 50 FPS
 }
 
 void GLDrawer::drawAgent(const Agent& agent)
@@ -269,7 +284,7 @@ void GLDrawer::drawFood(int x, int y, float quantity)
 void GLDrawer::storeStates(QQueue< SimState* > states)
 {
     mStateQueue.append(states);
-//     qDebug() << "backlog: " << mStateQueue.size();
+    qDebug() << "state buffer: " << mStateQueue.size();
 }
 
 
@@ -283,4 +298,15 @@ void GLDrawer::incrementSkip()
 {
     skipdraw += 1;
     qDebug() << "skipdraw:" << skipdraw;
+}
+
+
+void GLDrawer::toggleDrawing()
+{
+    if(draw) {
+        draw = false;
+    } else {
+        draw = true;
+        QTimer::singleShot(0, this, SLOT(updateGL()));
+    }
 }

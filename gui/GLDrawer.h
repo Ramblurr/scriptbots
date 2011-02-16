@@ -6,7 +6,7 @@
 
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/QQueue>
-#include <QtCore/QTimer>
+#include <QtCore/QTime>
 
 
 Q_DECLARE_METATYPE(Food);
@@ -29,6 +29,7 @@ public slots:
     void storeStates(QQueue<SimState*> states);
     void incrementSkip();
     void decrementSkip();
+    void toggleDrawing();
     
 protected:
     virtual void initializeGL();
@@ -48,7 +49,7 @@ private:
     int frames;
     
     QQueue<SimState*> mStateQueue;
-    QTimer mUpdateTimer;
+    QTime mTime;
 };
 
 #endif // GLDRAWER_H

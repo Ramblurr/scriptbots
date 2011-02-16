@@ -29,13 +29,13 @@ void doQt(int argc, char **argv)
 MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
 {
     mGLWidget = new GLDrawer(this);
-    setCentralWidget(mGLWidget);
-
+    mController = new SimulationController;
     mToolBar = new QToolBar(this);
+    
+    setCentralWidget(mGLWidget);
     addToolBar(mToolBar);
     setupToolbar();
     
-    mController = new SimulationController;
     
     connect( this,        SIGNAL( startSimulation() ), 
               mController, SLOT(   startSimulation() ), Qt::QueuedConnection );
@@ -49,14 +49,17 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( this,        SIGNAL( toggleDrawing() ), 
               mController, SLOT(   toggleDrawing() ), Qt::QueuedConnection );
     
+    connect( this,        SIGNAL( toggleDrawing() ), 
+              mGLWidget,   SLOT(   toggleDrawing() ), Qt::QueuedConnection );
+    
     connect( mController, SIGNAL( simStateBatch( QQueue<SimState*> ) ),
               mGLWidget,   SLOT(   storeStates( QQueue<SimState*> ) ), Qt::QueuedConnection );
     
     connect( mController, SIGNAL( ticksPerSecond(int) ), 
-              this,   SLOT( slotFpsUpdate(int) ), Qt::QueuedConnection );
+              this,        SLOT(   slotFpsUpdate(int) ), Qt::QueuedConnection );
     
-    connect( mGLWidget, SIGNAL(   finished( SimState* ) ),
-              mController,   SLOT( reapState(SimState* ) ), Qt::QueuedConnection );
+    connect( mGLWidget,   SIGNAL( finished( SimState* ) ),
+              mController, SLOT(   reapState(SimState* ) ), Qt::QueuedConnection );
     
     mController->moveToThread(&mThread);
     mThread.start(QThread::HighestPriority);
@@ -97,13 +100,13 @@ void MainWindow::setupToolbar()
     QAction* incrSkipAct = mToolBar->addAction( 
                                 QIcon::fromTheme( "list-add" ), 
                                 tr( "&Increment Skip" ), 
-                                mGLWidget, 
+                                mController, 
                                 SLOT( incrementSkip() ) );
     
     QAction* decrSkipAct = mToolBar->addAction( 
                                 QIcon::fromTheme( "list-remove" ), 
                                 tr( "&Decrement Skip" ), 
-                                mGLWidget, 
+                                mController, 
                                 SLOT( decrementSkip() ) );
     
 //     menuBar()->addMenu("&Hi");
@@ -139,6 +142,7 @@ void MainWindow::slotToggleDrawing()
 void MainWindow::slotFpsUpdate(int fps)
 {
     QString title = "FPS: " + QString::number(fps);
+    qDebug() << "tps: " << fps;
     setWindowTitle(title);
 }
 

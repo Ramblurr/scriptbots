@@ -17,29 +17,37 @@ SimulationController::~SimulationController()
 
 void SimulationController::doTick()
 {
-//     while(1) {
-    if( !mWorld->isPaused()  ) {
+    if( mWorld->isPaused() )
+        return;
+
+    if( !mDraw ) {
         mWorld->update();
         ++mModcounter;
         ++mFrames;
-        if( mDraw /*&& mModcounter % mSkipdraw  == 0*/) {
-            if( !mStack.isEmpty() ) {
-                SimState *s  = 0;
-                s = mStack.pop();
-                mWorld->getAgents(s->agents );
-        //             mWorld->getFood(s->food);
-                mStateBatch.enqueue(s);
-            }
-        }
         int msec = mTime.elapsed();
         if( msec >= 1000 ) {
             emit ticksPerSecond(mFrames);
-//             qDebug() << "fps:" << mFrames;
             mFrames = 0;
             mTime.restart();
         }
-        QMetaObject::invokeMethod(this, "doTick", Qt::QueuedConnection);
-    } 
+    } else if(!mStack.isEmpty() ) {
+        mWorld->update();
+        ++mModcounter;
+        ++mFrames;
+//         if( mDraw /*&& mModcounter % mSkipdraw  == 0*/) {
+//             if( !mStack.isEmpty() ) {
+        SimState *s = mStack.pop();
+        mWorld->getAgents(s->agents );
+//      mWorld->getFood(s->food);
+        mStateBatch.enqueue(s);
+        int msec = mTime.elapsed();
+        if( msec >= 1000 ) {
+            emit ticksPerSecond(mFrames);
+            mFrames = 0;
+            mTime.restart();
+        }
+    }
+    QMetaObject::invokeMethod(this, "doTick", Qt::QueuedConnection);
 }
 
 void SimulationController::reapState(SimState* state)
@@ -104,5 +112,15 @@ void SimulationController::resetSimulation()
 void SimulationController::toggleDrawing()
 {
     mDraw = !mDraw;
+}
+
+void SimulationController::decrementSkip()
+{
+    mSkipdraw += 1;
+}
+
+void SimulationController::incrementSkip()
+{
+    mSkipdraw -= 1;
 }
 

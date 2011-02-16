@@ -77,6 +77,9 @@ public slots:
      */
     void toggleDrawing();
     
+    void incrementSkip();
+    void decrementSkip();
+    
     /**
      * Re-takes ownership of a state object
      * Notifies the Controller that a state object is finished being
