@@ -2,8 +2,8 @@
 
 #include "vmath.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QTimer>
+#include <QDebug>
+#include <QTimer>
 
 SimulationController::SimulationController() : QObject( 0 ), mInitialized(false), mWorld(0), mModcounter(0), mFrames(0), mSkipdraw(2), mDraw(true)
 {

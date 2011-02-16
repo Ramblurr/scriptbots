@@ -5,10 +5,10 @@
 #include "View.h"
 #include "registertypes.h"
 
-#include <QtCore/QObject>
-#include <QtCore/QTime>
-#include <QtCore/QQueue>
-#include <QtCore/QStack>
+#include <QObject>
+#include <QTime>
+#include <QQueue>
+#include <QStack>
 
 /**
  * SimulationController controls the core simulation routine.

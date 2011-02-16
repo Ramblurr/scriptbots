@@ -4,10 +4,10 @@
 
 #include "settings.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QTime>
-#include <QtCore/QTimer>
-#include <QtCore/QCoreApplication>
+#include <QDebug>
+#include <QTime>
+#include <QTimer>
+#include <QCoreApplication>
 
 void drawCircle2(float x, float y, float r) {
     float n;

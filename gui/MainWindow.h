@@ -3,8 +3,8 @@
 
 #include "World.h"
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QThread>
+#include <QMainWindow>
+#include <QThread>
 
 extern void doQt(int argc, char **argv);
 
