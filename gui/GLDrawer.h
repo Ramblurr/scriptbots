@@ -4,9 +4,9 @@
 #include "World.h"
 #include "registertypes.h"
 
-#include <QtOpenGL/QGLWidget>
-#include <QtCore/QQueue>
-#include <QtCore/QTime>
+#include <QGLWidget>
+#include <QQueue>
+#include <QTime>
 
 
 Q_DECLARE_METATYPE(Food);

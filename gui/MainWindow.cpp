@@ -5,13 +5,13 @@
 #include "Agent.h"
 #include "registertypes.h"
 
-#include <QtCore/QTimer>
-#include <QtCore/QDebug>
-#include <QtGui/QMenuBar>
-#include <QtGui/QToolBar>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtCore/QQueue>
+#include <QTimer>
+#include <QDebug>
+#include <QMenuBar>
+#include <QToolBar>
+#include <QAction>
+#include <QApplication>
+#include <QQueue>
 
 void doQt(int argc, char **argv) 
 {

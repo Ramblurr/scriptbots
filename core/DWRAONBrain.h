@@ -4,7 +4,7 @@
 #include "settings.h"
 #include "helpers.h"
 
-#include <tr1/array>
+#include <array>
 
 #define INPUTSIZE 20
 #define OUTPUTSIZE 9

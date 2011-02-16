@@ -16,8 +16,10 @@
 
 #include <stdio.h>
 
+extern void doQt(int argc, char **argv);
+
 #ifdef HAVE_QT
-    #include "MainWindow.h"
+    //#include "MainWindow.h"
 #else
     GLView* GLVIEW = new GLView(0);
 #endif
