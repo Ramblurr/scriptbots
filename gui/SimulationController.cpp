@@ -57,9 +57,11 @@ void SimulationController::reapState(SimState* state)
 
 void SimulationController::sendUpdate()
 {
-    emit simStateBatch(mStateBatch);
-    mStateBatch.clear();
-    QTimer::singleShot(100, this, SLOT(sendUpdate()) );
+    if( mDraw ) {
+        emit simStateBatch(mStateBatch);
+        mStateBatch.clear();
+        QTimer::singleShot(100, this, SLOT(sendUpdate()) );
+    }
 }
 
 
@@ -111,7 +113,12 @@ void SimulationController::resetSimulation()
 
 void SimulationController::toggleDrawing()
 {
-    mDraw = !mDraw;
+    if( !mDraw ) {
+        QTimer::singleShot(100, this, SLOT( sendUpdate()) );
+        mDraw = true;
+    } else {
+        mDraw = false;
+    }
 }
 
 void SimulationController::decrementSkip()
