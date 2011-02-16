@@ -58,12 +58,12 @@ void GLDrawer::paintGL()
 {
     if( !draw )
         return;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     QTime now;
     now.start();
     ++modcounter;
     ++frames;
     if(!mStateQueue.isEmpty()) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glPushMatrix();
         SimState* s = mStateQueue.dequeue();
 
