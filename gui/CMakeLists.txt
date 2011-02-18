@@ -9,6 +9,8 @@ if(QT4_FOUND)
     SET( QT_USE_QTOPENGL TRUE )
 
     INCLUDE( ${QT_USE_FILE} )
+    include_directories( ${QT_INCLUDES} )
+    ADD_DEFINITIONS(${QT_DEFINITIONS})
 
     set( sbGUI_SRCS 
         SimulationController.cpp 
