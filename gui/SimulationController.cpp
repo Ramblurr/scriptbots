@@ -69,18 +69,18 @@ void SimulationController::startSimulation()
 {
     if(!mInitialized) {
         mStack.clear();
-        qDebug() << "Initializing state pool";
+//         qDebug() << "Initializing state pool";
         int max = 500;
         for(int i = 0; i < max; ++i) {
-            if( i% 10 == 0 )
-                qDebug() << "  making " << i << "/" <<max;
             SimState *s = new SimState;
+            
             s->agents.resize(60);
             mStack.push(s);
+            emit preparingStateBuffer(i, max);
         }
-        qDebug() << "done";
+//         qDebug() << "done";
         if( !mWorld ) {
-            qDebug() << "created new world";
+//             qDebug() << "created new world";
             mWorld = new World();
         }
         mInitialized = true;

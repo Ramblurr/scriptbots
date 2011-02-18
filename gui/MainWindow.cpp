@@ -59,6 +59,9 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     connect( mController, SIGNAL( ticksPerSecond(int) ), 
               this,        SLOT(   slotFpsUpdate(int) ), Qt::QueuedConnection );
     
+    connect( mController, SIGNAL( preparingStateBuffer(int,int) ), 
+              this,        SLOT(   slotPreparingBuffer(int,int) ), Qt::QueuedConnection );
+    
     connect( mGLWidget,   SIGNAL( finished( SimState* ) ),
               mController, SLOT(   reapState(SimState* ) ), Qt::QueuedConnection );
     
@@ -150,6 +153,11 @@ void MainWindow::slotFpsUpdate(int fps)
     QString title = "Ticks/second: " + QString::number(fps);
     statusBar()->showMessage(title);
 }
+
+void MainWindow::slotPreparingBuffer(int curr, int max)
+{
+    QString title = QString("Initializing State Pool: %1 of %2").arg(curr).arg(max);
+    statusBar()->showMessage(title);
 }
 
 

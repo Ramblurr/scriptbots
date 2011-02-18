@@ -36,6 +36,7 @@ private slots:
     void slotPause();
     void slotReset();
     void slotToggleDrawing();
+    void slotPreparingBuffer(int curr,int max);
     
 private:
     void setupToolbar();

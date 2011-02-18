@@ -51,6 +51,8 @@ signals:
      * The number of simulation ticks per second
      */
     void ticksPerSecond(int tps);
+    
+    void preparingStateBuffer(int current, int max);
 
 public slots:
     /**
@@ -101,6 +103,7 @@ private slots:
      * Sends a batch of SimStates
      */
     void sendUpdate();
+    
     
 private:
     
