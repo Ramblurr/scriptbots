@@ -81,7 +81,6 @@ void GLDrawer::paintGL()
     }
     int msec = mTime.elapsed();
     if( msec >= 1000 ) {
-        qDebug() << "FPS: " << frames;
         mTime.restart();
         frames = 0;
     }
