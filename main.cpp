@@ -1,12 +1,11 @@
 #include "GLView.h"
 #include "core/World.h"
 
-#include <ctime>
+#include <sys/time.h>
 
 #include "config.h"
 
-// #include <QtCore/QTime>
-// #include "World.h"
+#include "World.h"
 
 #ifdef LOCAL_GLUT32
     #include "glut.h"
@@ -15,6 +14,7 @@
 #endif
 
 #include <stdio.h>
+#include <ctime>
 
 extern void doQt(int argc, char **argv);
 
@@ -27,32 +27,41 @@ extern void doQt(int argc, char **argv);
 int main(int argc, char **argv) {
     srand(time(0));
     if (conf::WIDTH%conf::CZ!=0 || conf::HEIGHT%conf::CZ!=0) printf("CAREFUL! The cell size variable conf::CZ should divide evenly into  both conf::WIDTH and conf::HEIGHT! It doesn't right now!");
-    printf("p= pause, d= toggle drawing (for faster computation), f= draw food too, += faster, -= slower");
-    
+   
+    if( argc == 1) {
+        
 #ifdef HAVE_QT
     doQt(argc, argv);
 #else
+    printf("p= pause, d= toggle drawing (for faster computation), f= draw food too, += faster, -= slower");
     doGlut(argc,argv);
 #endif
-//    World* w = new World();
-//    QTime t;
-//    t.start();
-//    int fps = 0;
-//    bool go = true;
-//    int foo = 0;
-//    while(1) {
-//        ++fps;
-//         w->update();
-//         int msec = t.elapsed();
-//         if( msec >= 1000 ) {
-//             foo += 1000;
-//             printf("fps: %d, %d\n", fps, foo);
-//             fps= 0;
-//             t.restart();
-//         }
-//         if( foo >= 30000 )
-//             return 1;
-//    }
+
+    } else if( argc == 2 ) {
+        if( strcmp(argv[1], "-nogui") ) {
+            printf("usage: %s [-nogui]\n", argv[0]);
+            printf("without options starts in GUI mode.\n");
+            printf("with -nogui flag starts without GUI\n");
+            return 1;
+        }
+        World* w = new World();
+        int fps = 0, total_seconds = 0;
+        struct timeval start, end;
+        gettimeofday(&start, NULL);
+        while(1) {
+            ++fps;
+                w->update();
+                gettimeofday(&end, NULL);
+                if( (end.tv_sec  - start.tv_sec) >= 1 ) {
+                    total_seconds += 1;
+                    printf("fps: %d, %d\n", fps, total_seconds);
+                    fps = 0;
+                    gettimeofday(&start, NULL);
+                }
+                if( total_seconds >= 30 )
+                    break;
+        }
+    }
     return 0;
 }
 
