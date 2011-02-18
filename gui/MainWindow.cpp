@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QQueue>
+#include <QStatusBar>
 
 void doQt(int argc, char **argv) 
 {
@@ -63,6 +64,9 @@ MainWindow::MainWindow( QWidget *parent )  : QMainWindow(parent)
     
     mController->moveToThread(&mThread);
     mThread.start(QThread::HighestPriority);
+    
+    setStatusBar(new QStatusBar(this) );
+    statusBar()->hide();
     
 //     QTimer* t = new QTimer( this );
 //     t->start( 50 );
@@ -121,6 +125,7 @@ void MainWindow::timeout()
 
 void MainWindow::slotStart()
 {
+    statusBar()->show();
     emit startSimulation();
 }
 
@@ -141,9 +146,10 @@ void MainWindow::slotToggleDrawing()
 
 void MainWindow::slotFpsUpdate(int fps)
 {
-    QString title = "FPS: " + QString::number(fps);
-    qDebug() << "tps: " << fps;
-    setWindowTitle(title);
+    
+    QString title = "Ticks/second: " + QString::number(fps);
+    statusBar()->showMessage(title);
+}
 }
 
 
